@@ -29,7 +29,7 @@ router.beforeEach(async(to, from, next) => {
       // determine whether the user has obtained his permission roles through getInfo
       // 如果store中有角色，则放行
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
-      console.log("router.beforeEach" + hasRoles)
+      
       if (hasRoles) {
         next()
       } else {
