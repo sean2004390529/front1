@@ -13,7 +13,7 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: '/redirect/:path(.*)',  // * 表示匹配0个或多个路由
+        path: '/redirect/:path(.*)',
         component: () => import('@/views/redirect/index')
       }
     ]
@@ -47,11 +47,10 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+        meta: { title: '主页', icon: 'dashboard', affix: true }
       }
     ]
-  },
-
+  }
 ]
 
 export const asyncRoutes = [
@@ -59,26 +58,26 @@ export const asyncRoutes = [
     path: '/basic',
     component: Layout,
     redirect: '/basic/user',
-    meta: { title:'后台管理', icon:'edit', roles: ['admin']},
+    meta: { title: '后台管理', icon: 'edit', roles: ['admin'] },
     children: [
       {
         path: '/basic/user',
-        name:'用户管理',
+        name: '用户管理',
         component: () => import('@/views/basic/user'),
-        meta: { title: '用户管理', icon: 'user', roles: ['admin']}
+        meta: { title: '用户管理', icon: 'user', roles: ['admin'] }
       },
       {
         path: '/basic/role',
         name: '角色管理',
         component: () => import('@/views/basic/role'),
-        meta: { title: '角色管理', icon: 'guide', roles: ['admin']}
+        meta: { title: '角色管理', icon: 'guide', roles: ['admin'] }
       }
     ]
   },
   {
     path: 'https://www.baidu.com',
     component: Layout,
-    meta: { title: '链接', icon: 'link'}
+    meta: { title: '链接', icon: 'link' }
   },
   { path: '*', redirect: '/404', hidden: true }
 ]

@@ -94,6 +94,42 @@ export function formatTime(time, option) {
   }
 }
 
+// 自定义格式时间
+export function formatTime2(val) {
+  if (val === null || val === undefined) {
+    return ''
+  }
+  const date = new Date(val)
+  const year = date.getFullYear()
+  let month = date.getMonth() + 1
+  month = month > 9 ? month : ('0' + month)
+  let day = date.getDate()
+  day = day > 9 ? day : ('0' + day)
+  let hh = date.getHours()
+  hh = hh > 9 ? hh : ('0' + hh)
+  let mm = date.getMinutes()
+  mm = mm > 9 ? mm : ('0' + mm)
+  let ss = date.getSeconds()
+  ss = ss > 9 ? ss : ('0' + ss)
+  const time = year + '-' + month + '-' + day + ' ' + hh + ':' + mm + ':' + ss
+  return time
+}
+
+// 自定义格式日期
+export function formatDate(val) {
+  if (val === null || val === undefined) {
+    return ''
+  }
+  const date = new Date(val)
+  const year = date.getFullYear()
+  let month = date.getMonth() + 1
+  month = month > 9 ? month : ('0' + month)
+  let day = date.getDate()
+  day = day > 9 ? day : ('0' + day)
+  const time = year + '-' + month + '-' + day
+  return time
+}
+
 /**
  * @param {string} url
  * @returns {Object}
