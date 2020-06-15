@@ -80,8 +80,8 @@
         </el-form-item>
         <el-form-item label="禁用/启用" prop="status">
           <el-select v-model="temp.status" placeholder="请选择禁用或启用角色">
-            <el-option label="启用" value="1"></el-option>
-            <el-option label="禁用" value="0"></el-option>
+            <el-option label="启用" value="1" />
+            <el-option label="禁用" value="0" />
           </el-select>
         </el-form-item>
 
@@ -128,7 +128,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: undefined,
-        description:undefined,
+        description: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -201,8 +201,8 @@ export default {
         }
       })
       setTimeout(() => {
-          this.getList()
-        }, 500)
+        this.getList()
+      }, 500)
     },
     handleFilter() {
       this.listQuery.pageNum = 1
@@ -225,11 +225,11 @@ export default {
             })
           })
           setTimeout(() => {
-          this.getList()
-        }, 500)
+            this.getList()
+          }, 500)
         }
       })
-    },
+    }
   }
 }
 </script>

@@ -30,3 +30,19 @@ export function fetchList(data) {
     data
   })
 }
+
+export function createUser(data) {
+  return request({
+    url: '/user',
+    method: 'post',
+    data
+  })
+}
+
+export function updateUser(data) {
+  return request({
+    url: '/user',
+    method: 'put',
+    data
+  })
+}
