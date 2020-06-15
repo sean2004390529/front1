@@ -16,7 +16,7 @@ service.interceptors.request.use(
     // do something before request is sent
 
     if (store.getters.token) {
-      config.headers['Authorization'] = getToken()
+      config.headers['authorization'] = getToken()
     }
     return config
   },
@@ -33,7 +33,7 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     console.log(res)
-    
+
     if (res.code !== 0) {
       Message({
         message: res.msg || '请求失败',

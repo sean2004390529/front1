@@ -39,7 +39,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Date" width="150px" align="center">
+      <el-table-column label="创建日期" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.createTime | formatDate }}</span>
         </template>
