@@ -23,3 +23,11 @@ export function updateRole(data) {
     data
   })
 }
+
+export function deleteRoles(data) {
+  return request({
+    url: '/role',
+    method: 'delete',
+    data
+  })
+}

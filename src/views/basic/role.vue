@@ -7,6 +7,9 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="getList">
         刷新
       </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDeleteRole">
+        批量删除
+      </el-button>
       <el-input v-model="listQuery.name" placeholder="搜索角色名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.description" placeholder="搜索描述" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
@@ -23,7 +26,9 @@
       fit
       highlight-current-row
       style="width: 100%;"
+      @selection-change="handleSelectionChange"
     >
+      <el-table-column type="selection" width="55" />
       <el-table-column label="序号" sortable align="center" width="90px">
         <template slot-scope="{row, $index}">
           <span>{{ $index + 1 }}</span>
@@ -52,11 +57,11 @@
 
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row,$index)">
+          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
             修改
           </el-button>
 
-          <el-button size="mini" type="danger">
+          <el-button size="mini" type="danger" icon="el-icon-delete-solid" @click="handleDelete(row,$index)">
             删除
           </el-button>
         </template>
@@ -99,7 +104,7 @@
 </template>
 
 <script>
-import { fetchList, createRole, updateRole } from '@/api/role'
+import { fetchList, createRole, updateRole, deleteRoles } from '@/api/role'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -145,7 +150,8 @@ export default {
       },
       rules: {
         name: [{ required: true, message: '角色名字必填', trigger: 'blur' }]
-      }
+      },
+      deleteRoleList: []
     }
   },
   created() {
@@ -229,6 +235,61 @@ export default {
           }, 500)
         }
       })
+    },
+    handleDelete(row, index) {
+      this.deleteRoleList = []
+      this.deleteRoleList.push(row.id)
+      this.$confirm('是否删除此角色', '删除角色', {
+        confirmButtonText: '确定删除角色',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteRole()
+        this.$message({
+          type: 'success',
+          message: '删除角色成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消删除角色'
+        })
+      })
+    },
+    deleteRole() {
+      deleteRoles(this.deleteRoleList).then(response => {
+        this.deleteRoleList = []
+        this.getList()
+      })
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    batchDeleteRole() {
+      this.deleteRoleList = []
+      this.multipleSelection.forEach(item => {
+        this.deleteRoleList.push(item.id)
+      })
+      if (this.deleteRoleList.length === 0) {
+        this.$message('没有选中角色')
+      } else {
+        this.$confirm('是否删除选中角色', '批量删除角色', {
+          confirmButtonText: '确定删除角色',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteRole()
+          this.$message({
+            type: 'success',
+            message: '批量删除角色成功!'
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消删除角色'
+          })
+        })
+      }
     }
   }
 }
