@@ -5,7 +5,7 @@
       <draggable :set-data="setData" :list="list1" group="article" class="dragArea">
         <div v-for="element in list1" :key="element.id" class="list-complete-item">
           <div class="list-complete-item-handle">
-            {{ element.id }}[{{ element.author }}] {{ element.title }}
+            {{ element.name }}
           </div>
           <div style="position:absolute;right:0px;">
             <span style="float: right ;margin-top: -20px;margin-right:5px;" @click="deleteEle(element)">
@@ -20,7 +20,7 @@
       <draggable :list="list2" group="article" class="dragArea">
         <div v-for="element in list2" :key="element.id" class="list-complete-item">
           <div class="list-complete-item-handle2" @click="pushEle(element)">
-            {{ element.id }} [{{ element.author }}] {{ element.title }}
+            {{ element.name }} -- {{element.description}}
           </div>
         </div>
       </draggable>
@@ -82,6 +82,7 @@ export default {
       if (this.isNotInList2(ele)) {
         this.list2.unshift(ele)
       }
+      console.log(this.list1)
     },
     pushEle(ele) {
       for (const item of this.list2) {
@@ -94,6 +95,7 @@ export default {
       if (this.isNotInList1(ele)) {
         this.list1.push(ele)
       }
+      console.log(this.list1)
     },
     setData(dataTransfer) {
       // to avoid Firefox bug

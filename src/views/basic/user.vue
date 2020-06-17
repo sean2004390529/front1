@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <!--查询栏 -->
     <div class="filter-container">
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
@@ -66,9 +67,11 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row,$index)">
             修改
           </el-button>
-
           <el-button size="mini" type="danger">
             删除
+          </el-button>
+          <el-button type="success" size="mini" @click="getRole(row,$index)">
+            分配角色
           </el-button>
         </template>
       </el-table-column>
@@ -80,8 +83,8 @@
 
     <!-- 编辑框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="ID" prop="id" hidden>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="margin-left:50px;">
+        <el-form-item label="ID" prop="id" hidden disabled>
           <el-input v-model="temp.id" />
         </el-form-item>
         <el-form-item label="用户名" prop="username">
@@ -101,7 +104,7 @@
             <el-option label="启用" value="1" />
             <el-option label="禁用" value="0" />
           </el-select>
-        </el-form-item>
+        </el-form-item >
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -113,17 +116,43 @@
       </div>
     </el-dialog>
 
+    <!-- 分配角色框 -->
+    <el-dialog title="分配角色" :visible.sync="RoleFormVisible">
+      <el-form :model="tempRole" label-position="left" label-width="80px" style="margin-left:50px;">
+        <el-form-item label="ID" prop="userId">
+          <el-input v-model="tempRole.userId" disabled/>
+        </el-form-item>
+        <el-form-item label="用户名" prop="username" >
+          <el-input v-model="tempRole.username" disabled/>
+        </el-form-item>
+
+        <el-form-item label="分配角色">
+          <div class="editor-container">
+            <dnd-list :list1="tempRole.selectedRoles" :list2="tempRole.allRoles" list1-title="已分配角色" list2-title="可分配角色" />
+          </div>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="RoleFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="updateRole()">
+          分配角色
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, createUser, updateUser } from '@/api/user'
+import { fetchList, createUser, updateUser, fetchRoles, updateRoles } from '@/api/user'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
+import DndList from '@/components/DndList'
 
 export default {
   name: 'User',
-  components: { Pagination },
+  components: { Pagination, DndList },
   filters: {
     formatDate(time) {
       return formatDate(time)
@@ -161,11 +190,18 @@ export default {
         username: '',
         email: '',
         phone: '',
-        status: undefined
+        status: undefined,
       },
       rules: {
         username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
         password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
+      },
+      RoleFormVisible: false,
+      tempRole: {
+        userId: undefined,
+        username: '',
+        selectedRoles: [],
+        allRoles: []
       }
     }
   },
@@ -192,11 +228,19 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
+        userId: undefined,
         username: '',
         email: '',
         phone: '',
         status: 1
+      }
+    },
+    resetTempRole() {
+      this.tempRole = {
+        userId: undefined,
+        username: '',
+        selectedRoles: [],
+        allRoles: []
       }
     },
     handleCreate() {
@@ -239,7 +283,6 @@ export default {
           updateUser(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
-            console.log(this.list)
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -253,11 +296,34 @@ export default {
           }, 500)
         }
       })
+    },
+    getRole(row, index){
+      this.resetTempRole()
+      this.RoleFormVisible = true
+      this.tempRole.userId = row.id
+      this.tempRole.username = row.username
+      fetchRoles(row.id).then(response => {
+        this.tempRole.allRoles = response.data.allRoles
+        this.tempRole.selectedRoles = response.data.selectedRoles
+      })
+        
+    },
+    updateRole(){
+      const tempData = Object.assign({}, this.tempRole)
+      updateRoles(tempData).then(response => {
+        this.RoleFormVisible = false
+        this.$notify({
+          title: '成功',
+          message: '修改角色成功',
+          type: 'success',
+          duration: 5000
+        })
+      })
     }
   }
 }
 </script>
 
-<style>
+<style >
 
 </style>
