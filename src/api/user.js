@@ -61,3 +61,11 @@ export function updateRoles(data) {
     data
   })
 }
+
+export function deleteUsers(data) {
+  return request({
+    url: '/user',
+    method: 'delete',
+    data
+  })
+}

@@ -5,8 +5,11 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="getList">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh" @click="getList">
         刷新
+      </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDeleteUser">
+        批量删除
       </el-button>
       <el-input v-model="listQuery.username" placeholder="搜索用户名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.email" placeholder="搜索邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
@@ -25,7 +28,10 @@
       fit
       highlight-current-row
       style="width: 100%;"
+      @selection-change="handleSelectionChange"
     >
+      <el-table-column type="selection" width="55" />
+
       <el-table-column label="序号" sortable align="center" width="90px">
         <template slot-scope="{row, $index}">
           <span>{{ $index + 1 }}</span>
@@ -62,15 +68,15 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row,$index)">
+          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
             修改
           </el-button>
-          <el-button size="mini" type="danger">
+          <el-button size="mini" type="danger" icon="el-icon-delete-solid" @click="handleDelete(row,$index)">
             删除
           </el-button>
-          <el-button type="success" size="mini" @click="getRole(row,$index)">
+          <el-button type="success" size="mini" icon="el-icon-unlock" @click="getRole(row,$index)">
             分配角色
           </el-button>
         </template>
@@ -90,8 +96,8 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="temp.username" />
         </el-form-item>
-        <el-form-item label="密码" prop="password" v-if="showPwd">
-          <el-input  v-model="temp.password" type="password" />
+        <el-form-item v-if="showPwd" label="密码" prop="password">
+          <el-input v-model="temp.password" type="password" />
         </el-form-item>
         <el-form-item label="email" prop="email">
           <el-input v-model="temp.email" />
@@ -104,7 +110,7 @@
             <el-option label="启用" value="1" />
             <el-option label="禁用" value="0" />
           </el-select>
-        </el-form-item >
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -120,10 +126,10 @@
     <el-dialog title="分配角色" :visible.sync="RoleFormVisible">
       <el-form :model="tempRole" label-position="left" label-width="80px" style="margin-left:50px;">
         <el-form-item label="ID" prop="userId">
-          <el-input v-model="tempRole.userId" disabled/>
+          <el-input v-model="tempRole.userId" disabled />
         </el-form-item>
-        <el-form-item label="用户名" prop="username" >
-          <el-input v-model="tempRole.username" disabled/>
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="tempRole.username" disabled />
         </el-form-item>
 
         <el-form-item label="分配角色">
@@ -145,7 +151,7 @@
 </template>
 
 <script>
-import { fetchList, createUser, updateUser, fetchRoles, updateRoles } from '@/api/user'
+import { fetchList, createUser, updateUser, fetchRoles, updateRoles, deleteUsers } from '@/api/user'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 import DndList from '@/components/DndList'
@@ -190,7 +196,7 @@ export default {
         username: '',
         email: '',
         phone: '',
-        status: undefined,
+        status: undefined
       },
       rules: {
         username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
@@ -202,7 +208,9 @@ export default {
         username: '',
         selectedRoles: [],
         allRoles: []
-      }
+      },
+      deleteUserList: [],
+      multipleSelection: []
     }
   },
   created() {
@@ -297,7 +305,7 @@ export default {
         }
       })
     },
-    getRole(row, index){
+    getRole(row, index) {
       this.resetTempRole()
       this.RoleFormVisible = true
       this.tempRole.userId = row.id
@@ -306,9 +314,8 @@ export default {
         this.tempRole.allRoles = response.data.allRoles
         this.tempRole.selectedRoles = response.data.selectedRoles
       })
-        
     },
-    updateRole(){
+    updateRole() {
       const tempData = Object.assign({}, this.tempRole)
       updateRoles(tempData).then(response => {
         this.RoleFormVisible = false
@@ -319,6 +326,61 @@ export default {
           duration: 5000
         })
       })
+    },
+    handleDelete(row, index) {
+      this.deleteUserList = []
+      this.deleteUserList.push(row.id)
+      this.$confirm('是否删除此用户', '删除用户', {
+        confirmButtonText: '确定删除用户',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteUser()
+        this.$message({
+          type: 'success',
+          message: '删除用户成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消删除用户'
+        })
+      })
+    },
+    deleteUser() {
+      deleteUsers(this.deleteUserList).then(response => {
+        this.deleteUserList = []
+        this.getList()
+      })
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    batchDeleteUser() {
+      this.deleteUserList = []
+      this.multipleSelection.forEach(item => {
+        this.deleteUserList.push(item.id)
+      })
+      if (this.deleteUserList.length === 0) {
+        this.$message('没有选中用户')
+      } else {
+        this.$confirm('是否删除选中用户', '批量删除用户', {
+          confirmButtonText: '确定删除用户',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteUser()
+          this.$message({
+            type: 'success',
+            message: '批量删除用户成功!'
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消删除用户'
+          })
+        })
+      }
     }
   }
 }

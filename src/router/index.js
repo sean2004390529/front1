@@ -70,7 +70,7 @@ export const asyncRoutes = [
         path: '/basic/role',
         name: '角色管理',
         component: () => import('@/views/basic/role'),
-        meta: { title: '角色管理', icon: 'guide', roles: ['admin'] }
+        meta: { title: '角色管理', icon: 'lock', roles: ['admin'] }
       }
     ]
   },
