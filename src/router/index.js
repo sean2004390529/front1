@@ -75,6 +75,20 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/todo',
+    component: Layout,
+    redirect: '/todo/todo',
+    meta: { title: 'Todo', icon: 'list' },
+    children: [
+      {
+        path: '/todo/todo',
+        name: 'Todo待办',
+        component: () => import('@/views/todo/todo'),
+        meta: { title: 'Todo待办', icon: 'list'}
+      }
+    ]
+  },
+  {
     path: 'https://www.baidu.com',
     component: Layout,
     meta: { title: '链接', icon: 'link' }

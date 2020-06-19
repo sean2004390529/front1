@@ -4,7 +4,7 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="getList">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh" @click="getList">
         刷新
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDeleteRole">
@@ -151,7 +151,8 @@ export default {
       rules: {
         name: [{ required: true, message: '角色名字必填', trigger: 'blur' }]
       },
-      deleteRoleList: []
+      deleteRoleList: [],
+      multipleSelection: []
     }
   },
   created() {
