@@ -141,12 +141,6 @@
       </div>
     </el-dialog>
 
-    <el-collapse v-model="activeNames" @change="handleChange">
-      <el-collapse-item title="添加Todo" name="1">
-        <h1>开发中</h1>
-      </el-collapse-item>
-    </el-collapse>
-
   </div>
 </template>
 
@@ -357,9 +351,6 @@ export default {
           })
         })
       }
-    },
-    handleChange() {
-      console.log('el-collapse-change')
     }
   }
 }

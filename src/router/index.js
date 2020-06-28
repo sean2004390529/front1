@@ -61,6 +61,12 @@ export const asyncRoutes = [
     meta: { title: '后台管理', icon: 'edit', roles: ['admin'] },
     children: [
       {
+        path: '/basic/dept',
+        name: '部门管理',
+        component: () => import('@/views/basic/dept'),
+        meta: { title: '部门管理', icon: 'tree', roles: ['admin'] }
+      },
+      {
         path: '/basic/user',
         name: '用户管理',
         component: () => import('@/views/basic/user'),
