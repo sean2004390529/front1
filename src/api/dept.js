@@ -9,7 +9,14 @@ export function fetchList() {
 
 export function fetchAllDept() {
   return request({
-    url: '/dept/alllist',
+    url: '/depts',
+    method: 'get'
+  })
+}
+
+export function fetchSubDept(deptId) {
+  return request({
+    url: `/depts/sub/${deptId}`,
     method: 'get'
   })
 }
@@ -27,5 +34,12 @@ export function updateDept(data) {
     url: '/dept',
     method: 'put',
     data
+  })
+}
+
+export function deleteDept(deptId) {
+  return request({
+    url: `/dept/${deptId}`,
+    method: 'delete',
   })
 }

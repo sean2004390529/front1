@@ -38,7 +38,7 @@
         <el-form-item label="部门名称" prop="name">
           <el-input v-model="temp.name" placeholder="请输部门名称" />
         </el-form-item>
-        <el-form-item label="所属部门" prop="pid">
+        <el-form-item v-if="temp.pid!=0" label="所属部门" prop="pid">
           <el-select v-model="temp.pid" placeholder="请选择所属部门">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { fetchList, fetchAllDept, createDept, updateDept } from '@/api/dept'
+import { fetchList, fetchAllDept, createDept, updateDept, fetchSubDept, deleteDept } from '@/api/dept'
 
 export default {
   name: 'Roles',
@@ -156,6 +156,17 @@ export default {
         this.getList()
       }, 500)
     },
+    handleUpdate(data) {
+      this.temp = Object.assign({}, data) // copy obj
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+      fetchSubDept(this.temp.id).then(response => {
+        this.options = response.data
+      })
+    },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
@@ -178,16 +189,27 @@ export default {
         }
       })
     },
-    handleUpdate(data) {
-      this.temp = Object.assign({}, data) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+    deleteDept(deptId) {
+      deleteDept(deptId).then(response => {
+        this.getList()
       })
-      fetchAllDept().then(response => {
-        this.options = response.data
+    },
+    handleDelete(node, data){
+      this.$confirm('是否删除选中部门', '删除部门', {
+          confirmButtonText: '确定删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+        this.deleteDept(data.id)
+        this.$message({
+          type: 'success',
+          message: '删除部门成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消删除部门/删除部门失败'
+        })
       })
     },
     renderContent(h, { node, data, store }) {
@@ -196,7 +218,7 @@ export default {
           <span>{node.label}</span>
           <span>
             <el-button size='mini' type='text' on-click={ () => this.handleUpdate(data) }>修改</el-button>
-            <el-button size='mini' type='text' on-click={ () => this.remove(node, data) }>删除</el-button>
+            <el-button size='mini' type='text' on-click={ () => this.handleDelete(node, data) }>删除</el-button>
           </span>
         </span>)
     }

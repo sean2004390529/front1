@@ -168,6 +168,7 @@ export default {
       })
     },
     handleUpdate(row, index) {
+      row.status = row.status.toString()
       this.temp = Object.assign({}, row) // copy obj
       // this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
@@ -181,11 +182,12 @@ export default {
         id: undefined,
         name: '',
         description: '',
-        status: undefined
+        status: 1
       }
     },
     handleCreate() {
       this.resetTemp()
+      this.temp.status = this.temp.status.toString()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {

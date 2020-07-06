@@ -38,25 +38,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="用户名" prop="username" sortable align="center">
+      <el-table-column label="用户名" prop="username" sortable align="center" width="150px" >
         <template slot-scope="{row}">
           <span>{{ row.username }}</span>
-        </template>
+        </template>21
       </el-table-column>
 
-      <el-table-column label="email" prop="email" sortable align="center">
+      <el-table-column label="email" prop="email" sortable align="center" width="250px">
         <template slot-scope="{row}">
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="电话号码" prop="phone" sortable align="center">
+      <el-table-column label="电话号码" prop="phone" sortable align="center" width="150px">
         <template slot-scope="{row}">
           <span>{{ row.phone }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="禁用/启用" width="150px" align="center">
+      <el-table-column label="禁用/启用" width="100px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.status | formatStatus }}</span>
         </template>
@@ -226,6 +226,7 @@ export default {
       })
     },
     handleUpdate(row, index) {
+      row.status = row.status.toString()
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.showPwd = false
@@ -253,6 +254,7 @@ export default {
     },
     handleCreate() {
       this.resetTemp()
+      this.temp.status = this.temp.status.toString()
       this.dialogStatus = 'create'
       this.showPwd = true
       this.dialogFormVisible = true
