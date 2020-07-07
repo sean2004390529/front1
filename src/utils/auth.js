@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'authorization'
+const TokenKey = 'Authorization'
 const RefreshTokey = 'refreshToken'
 
 export function getToken() {

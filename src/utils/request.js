@@ -16,7 +16,9 @@ service.interceptors.request.use(
     // do something before request is sent
 
     if (store.getters.token) {
-      config.headers['authorization'] = getToken()
+      config.headers['Authorization'] = getToken()
+      // config.headers['Authorization'] = localStorage.getItem('Authorization'
+      // config.headers.Authorization = store.getters.token
     }
     return config
   },
