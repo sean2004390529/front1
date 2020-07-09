@@ -90,7 +90,51 @@ export const asyncRoutes = [
         path: '/todo/todo',
         name: 'Todo待办',
         component: () => import('@/views/todo/todo'),
-        meta: { title: 'Todo待办', icon: 'list'}
+        meta: { title: 'Todo待办', icon: 'list' }
+      }
+    ]
+  },
+  {
+    path: '/stock',
+    component: Layout,
+    redirect: '/stock/reuse',
+    meta: { title: '物品管理', icon: 'table' },
+    children: [
+      {
+        path: '/stock/staff',
+        name: '使用人',
+        component: () => import('@/views/stock/staff'),
+        meta: { title: '使用人', icon: 'peoples' }
+      },
+      {
+        path: '/stock/purchase',
+        name: '购买记录',
+        component: () => import('@/views/stock/purchase'),
+        meta: { title: '购买记录', icon: 'shopping' }
+      },
+      {
+        path: '/stock/disposable',
+        name: '一次性物品',
+        component: () => import('@/views/stock/disposable'),
+        meta: { title: '一次性物品', icon: 'table' }
+      },
+      {
+        path: '/stock/dispense',
+        name: '一次性分发',
+        component: () => import('@/views/stock/dispense'),
+        meta: { title: '一次性分发', icon: 'table' }
+      },
+      {
+        path: '/stock/reuse',
+        name: '重复使用品',
+        component: () => import('@/views/stock/reuse'),
+        meta: { title: '重复使用品', icon: 'tab' }
+      },
+      {
+        path: '/stock/borrow',
+        name: '借用记录',
+        component: () => import('@/views/stock/borrow'),
+        meta: { title: '借用记录', icon: 'tab' }
       }
     ]
   },

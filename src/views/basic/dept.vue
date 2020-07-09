@@ -65,7 +65,7 @@ export default {
   name: 'Roles',
   data() {
     return {
-      listLoading: false,
+      listLoading: true,
       filterText: '',
       list: null,
       options: null,
@@ -194,12 +194,12 @@ export default {
         this.getList()
       })
     },
-    handleDelete(node, data){
+    handleDelete(node, data) {
       this.$confirm('是否删除选中部门', '删除部门', {
-          confirmButtonText: '确定删除',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+        confirmButtonText: '确定删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
         this.deleteDept(data.id)
         this.$message({
           type: 'success',
