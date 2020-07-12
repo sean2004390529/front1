@@ -31,3 +31,10 @@ export function deleteReuse(data) {
     data
   })
 }
+
+export function fetchAllStaff() {
+  return request({
+    url: '/stock/staff/nopage',
+    method: 'get'
+  })
+}

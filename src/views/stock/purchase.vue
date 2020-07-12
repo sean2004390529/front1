@@ -283,7 +283,7 @@ export default {
             })
           })
         }
-      }),
+      })
       setTimeout(() => {
         this.getList()
       }, 500)

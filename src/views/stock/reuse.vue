@@ -13,6 +13,9 @@
       </el-button>
       <br>
       <el-input v-model="listQuery.goodsname" placeholder="搜索物品名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.personId" placeholder="筛选借用人" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="item in options" :key="item.id" :label="item.staffname" :value="item.id" />
+      </el-select>
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
@@ -76,7 +79,7 @@
 
     <!-- 编辑框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="margin-left:50px;">
         <el-form-item label="ID" prop="id" hidden>
           <el-input v-model="temp.id" :disabled="true" />
         </el-form-item>
@@ -95,6 +98,12 @@
           />
         </el-form-item>
 
+        <el-form-item label="正在使用人" prop="personId">
+          <el-select v-model="temp.personId" placeholder="请选择使用人">
+            <el-option v-for="item in options" :key="item.id" :label="item.staffname" :value="item.id" />
+          </el-select>
+        </el-form-item>
+
         <!-- <el-form-item label="可否复用">
           <el-select v-model="temp.reuse" class="filter-item" placeholder="请选择状态">
             <el-option key="1" value="1" label="可复用" />
@@ -111,34 +120,33 @@
         </el-button>
       </div>
     </el-dialog>
-
-
-
   </div>
 </template>
 
 <script>
-import { fetchList, createReuse, updateReuse, deleteReuse } from '@/api/reuse'
+import { fetchList, createReuse, updateReuse, deleteReuse, fetchAllStaff } from '@/api/reuse'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'reuse',
+  name: 'Reuse',
   components: { Pagination },
   filters: {
     formatDate(time) {
       return formatDate(time)
-    },
+    }
   },
   data() {
     return {
       tableKey: 0,
       listLoading: false,
       list: null,
+      options: null,
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        goodsname: undefined
+        goodsname: undefined,
+        personId: undefined
       },
       total: 0,
       dialogFormVisible: false,
@@ -152,6 +160,7 @@ export default {
         goodsname: undefined,
         number: undefined,
         createTime: undefined,
+        personId: undefined
         // reuse: undefined
       },
       rules: {
@@ -189,6 +198,7 @@ export default {
     }
   },
   created() {
+    this.fetchAllStaff()
     this.getList()
   },
   methods: {
@@ -206,6 +216,7 @@ export default {
         goodsname: undefined,
         number: undefined,
         createTime: undefined,
+        personId: undefined
         // reuse: undefined
       }
     },
@@ -215,10 +226,17 @@ export default {
     },
     clearFilter() {
       this.listQuery.goodsname = undefined
+      this.listQuery.personId = undefined
       this.getList()
     },
-    handleCreate(){
+    fetchAllStaff() {
+      fetchAllStaff().then(response => {
+        this.options = response.data
+      })
+    },
+    handleCreate() {
       this.resetTemp()
+      this.fetchAllStaff()
       this.temp.createTime = +new Date()
       this.temp.reuse = 1
       this.temp.reuse = this.temp.reuse.toString()
@@ -240,11 +258,16 @@ export default {
               type: 'success',
               duration: 5000
             })
+            setTimeout(() => {
+              this.getList()
+            }, 500)
           })
         }
       })
     },
     handleUpdate(row, index) {
+      this.fetchAllStaff()
+      this.temp.personId = row.personId.toString()
       // row.reuse = row.reuse.toString()
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
@@ -259,8 +282,6 @@ export default {
           const tempData = Object.assign({}, this.temp)
           // tempData.updateTime = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateReuse(tempData).then(() => {
-            console.log("updateData")
-            console.log(tempData)
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
             this.dialogFormVisible = false
@@ -270,10 +291,10 @@ export default {
               type: 'success',
               duration: 5000
             })
+            setTimeout(() => {
+              this.getList()
+            }, 500)
           })
-          setTimeout(() => {
-            this.getList()
-          }, 500)
         }
       })
     },
