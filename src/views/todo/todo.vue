@@ -106,7 +106,7 @@
     <el-dialog title="编辑Todo" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px">
         <el-form-item label="ID" prop="id" hidden>
-          <el-input v-model="temp.id" :disabled="true"/>
+          <el-input v-model="temp.id" :disabled="true" />
         </el-form-item>
         <el-form-item label="描述" prop="description">
           <el-input v-model="temp.description" placeholder="请输入Todo内容" />

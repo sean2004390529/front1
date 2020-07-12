@@ -91,33 +91,33 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="margin-left:50px;">
         <el-form-item label="ID" prop="id" hidden>
-          <el-input v-model="temp.id" :disabled="true"/>
+          <el-input v-model="temp.id" :disabled="true" />
         </el-form-item>
         <el-form-item label="物品名称" prop="goodsname">
           <el-input v-model="temp.goodsname" />
         </el-form-item>
         <el-form-item label="数量" prop="number">
-          <el-input-number v-model="temp.number" :min="0" controls-position="right"/>
+          <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
         <el-form-item label="总金额" prop="amount">
-          <el-input-number v-model="temp.amount" controls-position="right"/>
+          <el-input-number v-model="temp.amount" controls-position="right" />
         </el-form-item>
         <el-form-item label="购买目的" prop="purpose">
           <el-input v-model="temp.purpose" />
         </el-form-item>
-        <!-- <el-form-item label="购买日期" prop="createTime">
-          <el-input v-model="temp.createTime" />
-        </el-form-item> -->
         <el-form-item label="购买日期" prop="createTime">
           <el-date-picker
-            v-model=temp.createTime type="date" :picker-options="pickerOptions" placeholder="请选择购买日期">
-          </el-date-picker>
+            v-model="temp.createTime"
+            placeholder="请选择购买日期"
+            type="date"
+            :picker-options="pickerOptions"
+          />
         </el-form-item>
 
         <el-form-item label="可否复用">
           <el-select v-model="temp.reuse" class="filter-item" placeholder="请选择状态">
-            <el-option key="1" value=1 label="可复用" />
-            <el-option key="0" value=0 label="一次性用品" />
+            <el-option key="1" value="1" label="可复用" />
+            <el-option key="0" value="0" label="一次性用品" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -135,7 +135,7 @@
 </template>
 
 <script>
-import { fetchList, createPurchase, updatePurchase, deletePurchase} from '@/api/purchase'
+import { fetchList, createPurchase, updatePurchase, deletePurchase } from '@/api/purchase'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -147,7 +147,7 @@ export default {
       return formatDate(time)
     },
     typeFilter(status) {
-      const typeMap = ['info','success']
+      const typeMap = ['info', 'success']
       return typeMap[status]
     },
     reuseFilter(status) {
@@ -193,29 +193,29 @@ export default {
       // reuseOptions: ['可复用', '一次性用品'],
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
+          return time.getTime() > Date.now()
         },
         shortcuts: [{
           text: '今天',
           onClick(picker) {
-            picker.$emit('pick', new Date());
+            picker.$emit('pick', new Date())
           }
         }, {
           text: '昨天',
           onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() - 3600 * 1000 * 24);
-            picker.$emit('pick', date);
+            const date = new Date()
+            date.setTime(date.getTime() - 3600 * 1000 * 24)
+            picker.$emit('pick', date)
           }
         }, {
           text: '一周前',
           onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', date);
+            const date = new Date()
+            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', date)
           }
         }]
-      },
+      }
     }
   },
   created() {
