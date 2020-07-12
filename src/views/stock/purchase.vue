@@ -11,6 +11,15 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDelete">
         批量删除
       </el-button>
+      <br>
+      <el-input v-model="listQuery.goodsname" placeholder="搜索物品名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.purpose" placeholder="搜索购买目的" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
+        Search
+      </el-button>
+      <el-button class="filter-item" type="info" icon="el-icon-circle-close" @click="clearFilter">
+        清除筛选
+      </el-button>
     </div>
 
     <!-- 表格 -->
@@ -158,15 +167,14 @@ export default {
   data() {
     return {
       tableKey: 0,
-      listLoading: false,
+      listLoading: true,
       list: null,
       options: null,
       listQuery: {
         pageNum: 1,
         pageSize: 10,
         goodsname: undefined,
-        purpose: undefined,
-        date: undefined
+        purpose: undefined
       },
       total: 0,
       dialogFormVisible: false,
@@ -241,9 +249,20 @@ export default {
         reuse: undefined
       }
     },
+    handleFilter() {
+      this.listQuery.pageNum = 1
+      this.getList()
+    },
+    clearFilter() {
+      this.listQuery.goodsname = undefined
+      this.listQuery.purpose = undefined
+      this.getList()
+    },
     handleCreate() {
       this.resetTemp()
       this.temp.createTime = +new Date()
+      this.temp.reuse = 0
+      this.temp.reuse = this.temp.reuse.toString()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -264,7 +283,10 @@ export default {
             })
           })
         }
-      })
+      }),
+      setTimeout(() => {
+        this.getList()
+      }, 500)
     },
     handleUpdate(row, index) {
       row.reuse = row.reuse.toString()

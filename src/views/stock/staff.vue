@@ -10,7 +10,8 @@
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDeleteStaff">
         批量删除
-      </el-button><br>
+      </el-button>
+      <br>
       <el-input v-model="listQuery.staffname" placeholder="搜索员工名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.email" placeholder="搜索邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.phone" placeholder="搜索电话" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
