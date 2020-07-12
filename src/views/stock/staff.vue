@@ -160,17 +160,17 @@ export default {
         staffname: [{ required: true, message: '员工名不能为空', trigger: 'blur' }]
       },
       deleteStaffList: [],
-      multipleSelection: [],
-      deptList: {}
+      multipleSelection: []
+      // deptList: {}
     }
   },
   created() {
-      // fetchAllDept().then(response => {
-      //   this.options = response.data
-      //   this.options.forEach(item => {
-      //     this.deptList[item.id] = item.name
-      //   })
-      // })
+    // fetchAllDept().then(response => {
+    //   this.options = response.data
+    //   this.options.forEach(item => {
+    //     this.deptList[item.id] = item.name
+    //   })
+    // })
     this.getList()
   },
   methods: {
