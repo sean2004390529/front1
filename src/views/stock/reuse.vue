@@ -62,6 +62,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="正在使用人" prop="personId" sortable align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.personId }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
@@ -239,7 +245,6 @@ export default {
       this.fetchAllStaff()
       this.temp.createTime = +new Date()
       this.temp.reuse = 1
-      this.temp.reuse = this.temp.reuse.toString()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
