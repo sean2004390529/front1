@@ -25,7 +25,6 @@
       <el-button class="filter-item" type="warning" icon="el-icon-warning-outline" @click="showUnreturn">
         显示所有未归还
       </el-button>
-      <br>
     </div>
 
     <!-- 表格 -->
@@ -216,7 +215,9 @@ export default {
         id: undefined,
         goodsname: undefined,
         number: undefined,
-        createTime: undefined,
+        borrowDate: undefined,
+        expectReturn: undefined,
+        actualReturn: undefined,
         personId: undefined
       },
       rules: {
