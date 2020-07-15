@@ -54,7 +54,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="总金额" prop="amount" sortable align="center">
+      <el-table-column label="单位" prop="unit" sortable align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.unit }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="总金额(元)" prop="amount" sortable align="center">
         <template slot-scope="{row}">
           <span>{{ row.amount }}</span>
         </template>
@@ -108,7 +114,18 @@
         <el-form-item label="数量" prop="number">
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
-        <el-form-item label="总金额" prop="amount">
+        <!-- <el-form-item label="单位" prop="unit">
+          <el-input v-model="temp.unit" />
+        </el-form-item> -->
+        <el-form-item label="单位" prop="unit">
+          <el-autocomplete
+            v-model="temp.unit"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入单位"
+            @select="handleSelect"
+          ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="总金额(元)" prop="amount">
           <el-input-number v-model="temp.amount" controls-position="right" />
         </el-form-item>
         <el-form-item label="购买目的" prop="purpose">
@@ -144,7 +161,7 @@
 </template>
 
 <script>
-import { fetchList, createPurchase, updatePurchase, deletePurchase } from '@/api/purchase'
+import { fetchList, createPurchase, updatePurchase, deletePurchase, fetchUnit } from '@/api/purchase'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -170,9 +187,11 @@ export default {
       listLoading: true,
       list: null,
       options: null,
+      unitList: [],
+      timeout: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         goodsname: undefined,
         purpose: undefined
       },
@@ -190,7 +209,8 @@ export default {
         amount: undefined,
         purpose: undefined,
         createTime: undefined,
-        reuse: undefined
+        reuse: undefined,
+        unit: undefined
       },
       rules: {
         goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
@@ -228,6 +248,7 @@ export default {
   },
   created() {
     this.getList()
+    this.fetchUnit()
   },
   methods: {
     getList() {
@@ -246,7 +267,8 @@ export default {
         amount: undefined,
         purpose: undefined,
         createTime: undefined,
-        reuse: undefined
+        reuse: undefined,
+        unit: undefined
       }
     },
     handleFilter() {
@@ -373,6 +395,30 @@ export default {
           })
         })
       }
+    },
+    querySearchAsync(queryString, cb) {
+      cb(this.unitList)
+    },
+    // querySearchAsync(queryString, cb) {
+    //   const unitList = this.unitList
+    //   const results = queryString ? unitList.filter(this.createStateFilter(queryString)) : unitList;
+    //   clearTimeout(this.timeout);
+    //   this.timeout = setTimeout(() => {
+    //     cb(results);
+    //   }, 500);
+    // },
+    // createStateFilter(queryString) {
+    //   return (state) => {
+    //     return (state.value.indexOf(queryString) === 0);
+    //   };
+    // },
+    handleSelect(item) {
+      console.log(item);
+    },
+    fetchUnit(){
+      fetchUnit().then(response => {
+        this.unitList = response.data
+      })
     }
   }
 }

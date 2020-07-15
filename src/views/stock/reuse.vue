@@ -16,6 +16,10 @@
       <el-select v-model="listQuery.personId" placeholder="筛选借用人" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in options" :key="item.id" :label="item.staffname" :value="item.id" />
       </el-select>
+      <el-select v-model="listQuery.isBorrow" placeholder="筛选借用状态" clearable style="width: 150px" class="filter-item" @change="handleFilter">
+        <el-option key="1" value="1" label="借出" />
+        <el-option key="0" value="0" label="在库" />
+      </el-select>
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
@@ -55,7 +59,11 @@
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column label="单位" prop="unit" sortable align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.unit }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="购买日期" prop="createTime" sortable align="center">
         <template slot-scope="{row}">
           <span>{{ row.createTime | formatDate }}</span>
@@ -64,10 +72,19 @@
 
       <el-table-column label="正在使用人" prop="personId" sortable align="center">
         <template slot-scope="{row}">
-          <span>{{ row.personId }}</span>
+          <el-select v-model="row.personId" disabled placeholder="请选择使用人">
+            <el-option v-for="item in options" :key="item.id" :label="item.staffname" :value="item.id" />
+          </el-select>
         </template>
       </el-table-column>
 
+      <el-table-column label="借出状态" sortable class-name="status-col" width="80">
+        <template slot-scope="{row}">
+          <el-tag effect="dark" :type="row.isBorrow | typeFilter">
+            {{ row.isBorrow | borrowFilter }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
@@ -89,11 +106,16 @@
         <el-form-item label="ID" prop="id" hidden>
           <el-input v-model="temp.id" :disabled="true" />
         </el-form-item>
+
         <el-form-item label="物品名称" prop="goodsname">
           <el-input v-model="temp.goodsname" />
         </el-form-item>
+
         <el-form-item label="数量" prop="number">
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
+        </el-form-item>
+        <el-form-item label="单位" prop="unit">
+          <el-input v-model="temp.unit" />
         </el-form-item>
         <el-form-item label="购买日期" prop="createTime">
           <el-date-picker
@@ -110,12 +132,13 @@
           </el-select>
         </el-form-item>
 
-        <!-- <el-form-item label="可否复用">
-          <el-select v-model="temp.reuse" class="filter-item" placeholder="请选择状态">
-            <el-option key="1" value="1" label="可复用" />
-            <el-option key="0" value="0" label="一次性用品" />
+        <el-form-item label="借出状态">
+          <el-select v-model="temp.isBorrow" class="filter-item" placeholder="请选择状态">
+            <el-option key="1" value="1" label="借出" />
+            <el-option key="0" value="0" label="在库" />
           </el-select>
-        </el-form-item> -->
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -140,6 +163,14 @@ export default {
   filters: {
     formatDate(time) {
       return formatDate(time)
+    },
+    typeFilter(status) {
+      const typeMap = ['success', 'info']
+      return typeMap[status]
+    },
+    borrowFilter(status) {
+      const statusMap = ['在库', '借出']
+      return statusMap[status]
     }
   },
   data() {
@@ -150,9 +181,10 @@ export default {
       options: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         goodsname: undefined,
-        personId: undefined
+        personId: undefined,
+        isBorrow: undefined
       },
       total: 0,
       dialogFormVisible: false,
@@ -166,8 +198,9 @@ export default {
         goodsname: undefined,
         number: undefined,
         createTime: undefined,
-        personId: undefined
-        // reuse: undefined
+        personId: undefined,
+        isBorrow: undefined,
+        unit: undefined
       },
       rules: {
         goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
@@ -222,8 +255,9 @@ export default {
         goodsname: undefined,
         number: undefined,
         createTime: undefined,
-        personId: undefined
-        // reuse: undefined
+        personId: undefined,
+        isBorrow: undefined,
+        unit: undefined
       }
     },
     handleFilter() {
@@ -233,6 +267,7 @@ export default {
     clearFilter() {
       this.listQuery.goodsname = undefined
       this.listQuery.personId = undefined
+      this.listQuery.isBorrow = undefined
       this.getList()
     },
     fetchAllStaff() {
@@ -245,6 +280,8 @@ export default {
       this.fetchAllStaff()
       this.temp.createTime = +new Date()
       this.temp.reuse = 1
+      this.temp.isBorrow = 0
+      this.temp.isBorrow = this.temp.isBorrow.toString()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -272,7 +309,12 @@ export default {
     },
     handleUpdate(row, index) {
       this.fetchAllStaff()
-      this.temp.personId = row.personId.toString()
+      if (this.temp.isBorrow != null) {
+        this.temp.isBorrow = row.isBorrow.toString()
+      }
+      if (this.temp.personId != null) {
+        this.temp.personId = row.personId.toString()
+      }
       // row.reuse = row.reuse.toString()
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'

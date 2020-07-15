@@ -63,7 +63,9 @@
 
       <el-table-column label="正在使用人" prop="personId" sortable align="center">
         <template slot-scope="{row}">
-          <span>{{ row.personId }}</span>
+          <el-select v-model="row.personId" disabled placeholder="请选择使用人">
+            <el-option v-for="item in options" :key="item.id" :label="item.staffname" :value="item.id" />
+          </el-select>
         </template>
       </el-table-column>
 
@@ -156,7 +158,9 @@
         <el-form-item label="数量" prop="number">
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
-
+        <el-form-item label="单位" prop="unit">
+          <el-input v-model="temp.unit" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -200,7 +204,7 @@ export default {
       options: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         goodsname: undefined,
         personId: undefined
       },
@@ -215,10 +219,12 @@ export default {
         id: undefined,
         goodsname: undefined,
         number: undefined,
+        purpose: undefined,
+        personId: undefined,
         borrowDate: undefined,
         expectReturn: undefined,
         actualReturn: undefined,
-        personId: undefined
+        unit: undefined
       },
       rules: {
         goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
@@ -298,7 +304,8 @@ export default {
         personId: undefined,
         borrowDate: undefined,
         expectReturn: undefined,
-        actualReturn: undefined
+        actualReturn: undefined,
+        unit: undefined
       }
     },
     handleFilter() {

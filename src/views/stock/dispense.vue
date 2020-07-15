@@ -68,9 +68,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="借用数量" prop="number" sortable align="center">
+      <el-table-column label="派发数量" prop="number" sortable align="center">
         <template slot-scope="{row}">
           <span>{{ row.number }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="单位" prop="unit" sortable align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.unit }}</span>
         </template>
       </el-table-column>
 
@@ -121,7 +126,9 @@
         <el-form-item label="数量" prop="number">
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
-
+        <el-form-item label="单位" prop="unit">
+          <el-input v-model="temp.unit" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -157,7 +164,7 @@ export default {
       options: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         goodsname: undefined,
         purpose: undefined,
         personId: undefined
@@ -175,7 +182,8 @@ export default {
         number: undefined,
         purpose: undefined,
         personId: undefined,
-        dispenseDate: undefined
+        dispenseDate: undefined,
+        unit: undefined
       },
       rules: {
         goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
@@ -231,7 +239,8 @@ export default {
         number: undefined,
         purpose: undefined,
         personId: undefined,
-        dispenseDate: undefined
+        dispenseDate: undefined,
+        unit: undefined
       }
     },
     handleFilter() {
@@ -365,13 +374,6 @@ export default {
           })
         })
       }
-    },
-    showUnreturn() {
-      this.listLoading = true
-      fetchUnreturn().then(response => {
-        this.list = response.data
-        this.listLoading = false
-      })
     }
   }
 }

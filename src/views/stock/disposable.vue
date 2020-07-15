@@ -52,7 +52,11 @@
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column label="单位" prop="unit" sortable align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.unit }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="购买日期" prop="createTime" sortable align="center">
         <template slot-scope="{row}">
           <span>{{ row.createTime | formatDate }}</span>
@@ -85,6 +89,9 @@
         </el-form-item>
         <el-form-item label="数量" prop="number">
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
+        </el-form-item>
+        <el-form-item label="单位" prop="unit">
+          <el-input v-model="temp.unit" />
         </el-form-item>
         <el-form-item label="购买日期" prop="createTime">
           <el-date-picker
@@ -129,7 +136,7 @@ export default {
       options: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         goodsname: undefined
       },
       total: 0,
@@ -143,7 +150,8 @@ export default {
         id: undefined,
         goodsname: undefined,
         number: undefined,
-        createTime: undefined
+        createTime: undefined,
+        unit: undefined
       },
       rules: {
         goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }]
@@ -194,7 +202,8 @@ export default {
         id: undefined,
         goodsname: undefined,
         number: undefined,
-        createTime: undefined
+        createTime: undefined,
+        unit: undefined
       }
     },
     handleFilter() {

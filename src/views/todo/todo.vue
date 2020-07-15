@@ -174,7 +174,7 @@ export default {
       list: [],
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         description: undefined,
         result: undefined,
         status: '',

@@ -137,7 +137,7 @@ export default {
       options: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         staffname: undefined,
         email: undefined,
         phone: undefined,
