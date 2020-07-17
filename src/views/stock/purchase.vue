@@ -104,7 +104,7 @@
 
     <!-- 编辑框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="margin-left:50px;">
         <el-form-item label="ID" prop="id" hidden>
           <el-input v-model="temp.id" :disabled="true" />
         </el-form-item>
@@ -114,16 +114,13 @@
         <el-form-item label="数量" prop="number">
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
-        <!-- <el-form-item label="单位" prop="unit">
-          <el-input v-model="temp.unit" />
-        </el-form-item> -->
         <el-form-item label="单位" prop="unit">
           <el-autocomplete
             v-model="temp.unit"
             :fetch-suggestions="querySearchAsync"
             placeholder="请输入单位"
             @select="handleSelect"
-          ></el-autocomplete>
+          />
         </el-form-item>
         <el-form-item label="总金额(元)" prop="amount">
           <el-input-number v-model="temp.amount" controls-position="right" />
@@ -146,6 +143,10 @@
             <el-option key="0" value="0" label="一次性用品" />
           </el-select>
         </el-form-item>
+
+        <el-form-item label="保存到物品列表">
+          <el-switch v-model="temp.save" active-color="#13ce66" inactive-color="#ff4949" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -161,7 +162,8 @@
 </template>
 
 <script>
-import { fetchList, createPurchase, updatePurchase, deletePurchase, fetchUnit } from '@/api/purchase'
+import { fetchList, createPurchase, updatePurchase, deletePurchase } from '@/api/purchase'
+import { fetchUnit } from '@/api/common'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -210,7 +212,8 @@ export default {
         purpose: undefined,
         createTime: undefined,
         reuse: undefined,
-        unit: undefined
+        unit: undefined,
+        save: true
       },
       rules: {
         goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
@@ -285,6 +288,7 @@ export default {
       this.temp.createTime = +new Date()
       this.temp.reuse = 0
       this.temp.reuse = this.temp.reuse.toString()
+      this.temp.save = true
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -397,25 +401,21 @@ export default {
       }
     },
     querySearchAsync(queryString, cb) {
-      cb(this.unitList)
+      const unitList = this.unitList
+      const results = queryString ? unitList.filter(this.createStateFilter(queryString)) : unitList
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        cb(results)
+      }, 100)
     },
-    // querySearchAsync(queryString, cb) {
-    //   const unitList = this.unitList
-    //   const results = queryString ? unitList.filter(this.createStateFilter(queryString)) : unitList;
-    //   clearTimeout(this.timeout);
-    //   this.timeout = setTimeout(() => {
-    //     cb(results);
-    //   }, 500);
-    // },
-    // createStateFilter(queryString) {
-    //   return (state) => {
-    //     return (state.value.indexOf(queryString) === 0);
-    //   };
-    // },
+    createStateFilter(queryString) {
+      return (state) => {
+        return (state.value.indexOf(queryString) === 0)
+      }
+    },
     handleSelect(item) {
-      console.log(item);
     },
-    fetchUnit(){
+    fetchUnit() {
       fetchUnit().then(response => {
         this.unitList = response.data
       })

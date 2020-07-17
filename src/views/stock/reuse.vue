@@ -115,7 +115,12 @@
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
         <el-form-item label="单位" prop="unit">
-          <el-input v-model="temp.unit" />
+          <el-autocomplete
+            v-model="temp.unit"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入单位"
+            @select="handleSelect"
+          />
         </el-form-item>
         <el-form-item label="购买日期" prop="createTime">
           <el-date-picker
@@ -154,6 +159,7 @@
 
 <script>
 import { fetchList, createReuse, updateReuse, deleteReuse, fetchAllStaff } from '@/api/reuse'
+import { fetchUnit } from '@/api/common'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -176,9 +182,10 @@ export default {
   data() {
     return {
       tableKey: 0,
-      listLoading: false,
+      listLoading: true,
       list: null,
       options: null,
+      unitList: [],
       listQuery: {
         pageNum: 1,
         pageSize: 20,
@@ -239,6 +246,7 @@ export default {
   created() {
     this.fetchAllStaff()
     this.getList()
+    this.fetchUnit()
   },
   methods: {
     getList() {
@@ -309,14 +317,14 @@ export default {
     },
     handleUpdate(row, index) {
       this.fetchAllStaff()
+      // row.reuse = row.reuse.toString()
+      this.temp = Object.assign({}, row) // copy obj
       if (this.temp.isBorrow != null) {
         this.temp.isBorrow = row.isBorrow.toString()
       }
       if (this.temp.personId != null) {
         this.temp.personId = row.personId.toString()
       }
-      // row.reuse = row.reuse.toString()
-      this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -399,6 +407,26 @@ export default {
           })
         })
       }
+    },
+    querySearchAsync(queryString, cb) {
+      const unitList = this.unitList
+      const results = queryString ? unitList.filter(this.createStateFilter(queryString)) : unitList
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        cb(results)
+      }, 100)
+    },
+    createStateFilter(queryString) {
+      return (state) => {
+        return (state.value.indexOf(queryString) === 0)
+      }
+    },
+    handleSelect(item) {
+    },
+    fetchUnit() {
+      fetchUnit().then(response => {
+        this.unitList = response.data
+      })
     }
   }
 }

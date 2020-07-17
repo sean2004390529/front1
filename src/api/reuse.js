@@ -38,3 +38,10 @@ export function fetchAllStaff() {
     method: 'get'
   })
 }
+
+export function fetchReuse() {
+  return request({
+    url: '/stock/reuse/instock',
+    method: 'get'
+  })
+}

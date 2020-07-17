@@ -31,3 +31,10 @@ export function deleteDisposable(data) {
     data
   })
 }
+
+export function fetchDispo() {
+  return request({
+    url: '/stock/dispo/instock',
+    method: 'get'
+  })
+}

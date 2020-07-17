@@ -135,6 +135,12 @@ export const asyncRoutes = [
         name: '借用记录',
         component: () => import('@/views/stock/borrow'),
         meta: { title: '借用记录', icon: 'tab' }
+      },
+      {
+        path: '/stock/common',
+        name: '杂项',
+        component: () => import('@/views/stock/common'),
+        meta: { title: '杂项', icon: 'component' }
       }
     ]
   },

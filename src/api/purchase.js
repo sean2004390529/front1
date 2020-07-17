@@ -32,9 +32,3 @@ export function deletePurchase(data) {
   })
 }
 
-export function fetchUnit() {
-  return request({
-    url: '/stock/unit',
-    method: 'get'
-  })
-}

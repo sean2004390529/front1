@@ -101,8 +101,22 @@
         <el-form-item label="ID" prop="id" hidden>
           <el-input v-model="temp.id" :disabled="true" />
         </el-form-item>
-        <el-form-item label="物品名称" prop="goodsname">
+        <!-- <el-form-item label="物品名称" prop="goodsname">
           <el-input v-model="temp.goodsname" />
+        </el-form-item> -->
+        <el-form-item label="物品名称" prop="goodsname">
+          <el-autocomplete
+            v-model="temp.goodsname"
+            popper-class="my-autocomplete"
+            :fetch-suggestions="queryDispoListAsync"
+            placeholder="请输入物品名称"
+            @select="handleSelect"
+          >
+            <i slot="suffix" class="el-icon-edit el-input__icon" />
+            <template slot-scope="{ item }">
+              <span class="name">{{ item.value = item.goodsname }} - {{ item.number }} {{ item.unit }}</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
         <el-form-item label="正在使用人" prop="personId">
           <el-select v-model="temp.personId" placeholder="请选择使用人">
@@ -127,8 +141,13 @@
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
         <el-form-item label="单位" prop="unit">
-          <el-input v-model="temp.unit" />
+          <el-autocomplete
+            v-model="temp.unit"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入单位"
+          />
         </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -145,6 +164,8 @@
 
 <script>
 import { fetchList, createDispense, updateDispense, deleteDispense, fetchAllStaff } from '@/api/dispense'
+import { fetchUnit } from '@/api/common'
+import { fetchDispo } from '@/api/disposable'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -159,9 +180,11 @@ export default {
   data() {
     return {
       tableKey: 0,
-      listLoading: false,
+      listLoading: true,
       list: null,
       options: null,
+      unitList: [],
+      instockDispoList: [],
       listQuery: {
         pageNum: 1,
         pageSize: 20,
@@ -186,12 +209,11 @@ export default {
         unit: undefined
       },
       rules: {
-        goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
+        goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'change' }],
         personId: [{ required: true, message: '借用人不能为空', trigger: 'blur' }]
       },
       deleteDispenseList: [],
       multipleSelection: [],
-      // reuseOptions: ['可复用', '一次性用品'],
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
@@ -222,6 +244,7 @@ export default {
   created() {
     this.fetchAllStaff()
     this.getList()
+    this.fetchUnit()
   },
   methods: {
     getList() {
@@ -260,6 +283,7 @@ export default {
     handleCreate() {
       this.resetTemp()
       this.fetchAllStaff()
+      this.fetchDispo()
       this.temp.dispenseDate = +new Date()
       this.temp.reuse = 0
       this.temp.number = 1
@@ -290,6 +314,7 @@ export default {
     },
     handleUpdate(row, index) {
       this.fetchAllStaff()
+      this.fetchDispo()
       this.temp.personId = row.personId.toString()
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
@@ -374,11 +399,65 @@ export default {
           })
         })
       }
+    },
+    querySearchAsync(queryString, cb) {
+      const unitList = this.unitList
+      const results = queryString ? unitList.filter(this.createStateFilter(queryString)) : unitList
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        cb(results)
+      }, 100)
+    },
+    queryDispoListAsync(queryString, cb) {
+      const instockDispoList = this.instockDispoList
+      const results = queryString ? instockDispoList.filter(this.createStateFilter(queryString)) : instockDispoList
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        cb(results)
+      }, 100)
+    },
+    createStateFilter(queryString) {
+      return (state) => {
+        return (state.value.indexOf(queryString) === 0)
+      }
+    },
+    handleSelect(item) {
+      this.temp.goodsname = item.value
+      this.temp.unit = item.unit
+    },
+    fetchUnit() {
+      fetchUnit().then(response => {
+        this.unitList = response.data
+      })
+    },
+    fetchDispo() {
+      fetchDispo().then(response => {
+        this.instockDispoList = response.data
+      })
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss">
+.my-autocomplete {
+  li {
+    line-height: small;
+    padding: 7px;
 
+    .name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .addr {
+      font-size: 12px;
+      color: #b4b4b4;
+    }
+
+    .highlighted .addr {
+      color: #ddd;
+    }
+  }
+}
 </style>
+

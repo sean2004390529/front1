@@ -53,14 +53,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="借出状态" sortable class-name="status-col" width="180">
-        <template slot-scope="{row}">
-          <el-tag effect="dark" :type="row.isBorrow | typeFilter">
-            {{ row.isBorrow | isBorrowFilter }}
-          </el-tag>
-        </template>
-      </el-table-column>
-
       <el-table-column label="正在使用人" prop="personId" sortable align="center">
         <template slot-scope="{row}">
           <el-select v-model="row.personId" disabled placeholder="请选择使用人">
@@ -92,6 +84,11 @@
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="单位" prop="unit" sortable align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.unit }}</span>
+        </template>
+      </el-table-column>
 
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
@@ -116,7 +113,18 @@
           <el-input v-model="temp.id" :disabled="true" />
         </el-form-item>
         <el-form-item label="物品名称" prop="goodsname">
-          <el-input v-model="temp.goodsname" />
+          <el-autocomplete
+            v-model="temp.goodsname"
+            popper-class="my-autocomplete"
+            :fetch-suggestions="queryReuseListAsync"
+            placeholder="请输入物品名称"
+            @select="handleSelect"
+          >
+            <i slot="suffix" class="el-icon-edit el-input__icon" />
+            <template slot-scope="{ item }">
+              <span class="name">{{ item.value = item.goodsname }} - {{ item.number }} {{ item.unit }}</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
         <el-form-item label="正在使用人" prop="personId">
           <el-select v-model="temp.personId" placeholder="请选择使用人">
@@ -159,7 +167,11 @@
           <el-input-number v-model="temp.number" :min="0" controls-position="right" />
         </el-form-item>
         <el-form-item label="单位" prop="unit">
-          <el-input v-model="temp.unit" />
+          <el-autocomplete
+            v-model="temp.unit"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入单位"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -171,12 +183,13 @@
         </el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
 import { fetchList, createBorrow, updateBorrow, deleteBorrow, fetchAllStaff, fetchUnreturn } from '@/api/borrow'
+import { fetchUnit } from '@/api/common'
+import { fetchReuse } from '@/api/reuse'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -186,21 +199,15 @@ export default {
   filters: {
     formatDate(time) {
       return formatDate(time)
-    },
-    typeFilter(status) {
-      const typeMap = ['info', 'success']
-      return typeMap[status]
-    },
-    isBorrowFilter(status) {
-      const isBorrowMap = ['在库', '借出']
-      return isBorrowMap[status]
     }
   },
   data() {
     return {
       tableKey: 0,
-      listLoading: false,
+      listLoading: true,
       list: null,
+      unitList: [],
+      instockReuseList: [],
       options: null,
       listQuery: {
         pageNum: 1,
@@ -227,12 +234,11 @@ export default {
         unit: undefined
       },
       rules: {
-        goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
+        goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'change' }],
         personId: [{ required: true, message: '借用人不能为空', trigger: 'blur' }]
       },
       deleteBorrowList: [],
       multipleSelection: [],
-      // reuseOptions: ['可复用', '一次性用品'],
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
@@ -285,6 +291,7 @@ export default {
   created() {
     this.fetchAllStaff()
     this.getList()
+    this.fetchUnit()
   },
   methods: {
     getList() {
@@ -325,6 +332,7 @@ export default {
     handleCreate() {
       this.resetTemp()
       this.fetchAllStaff()
+      this.fetchReuse()
       this.temp.borrowDate = +new Date()
       this.temp.isBorrow = 1
       this.temp.reuse = 1
@@ -356,6 +364,7 @@ export default {
     },
     handleUpdate(row, index) {
       this.fetchAllStaff()
+      this.fetchReuse()
       this.temp.personId = row.personId.toString()
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
@@ -447,11 +456,64 @@ export default {
         this.list = response.data
         this.listLoading = false
       })
+    },
+    querySearchAsync(queryString, cb) {
+      const unitList = this.unitList
+      const results = queryString ? unitList.filter(this.createStateFilter(queryString)) : unitList
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        cb(results)
+      }, 100)
+    },
+    queryReuseListAsync(queryString, cb) {
+      const instockReuseList = this.instockReuseList
+      const results = queryString ? instockReuseList.filter(this.createStateFilter(queryString)) : instockReuseList
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        cb(results)
+      }, 100)
+    },
+    createStateFilter(queryString) {
+      return (state) => {
+        return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
+    handleSelect(item) {
+      this.temp.goodsname = item.value
+      this.temp.unit = item.unit
+    },
+    fetchUnit() {
+      fetchUnit().then(response => {
+        this.unitList = response.data
+      })
+    },
+    fetchReuse() {
+      fetchReuse().then(response => {
+        this.instockReuseList = response.data
+      })
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss">
+.my-autocomplete {
+  li {
+    line-height: small;
+    padding: 7px;
 
+    .name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .addr {
+      font-size: 12px;
+      color: #b4b4b4;
+    }
+
+    .highlighted .addr {
+      color: #ddd;
+    }
+  }
+}
 </style>
