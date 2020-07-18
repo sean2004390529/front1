@@ -54,12 +54,12 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="数量" prop="number" sortable align="center">
+      <el-table-column label="数量" prop="number" sortable align="center" width="90px">
         <template slot-scope="{row}">
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="单位" prop="unit" sortable align="center">
+      <el-table-column label="单位" prop="unit" sortable align="center" width="90px">
         <template slot-scope="{row}">
           <span>{{ row.unit }}</span>
         </template>

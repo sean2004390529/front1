@@ -48,13 +48,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="数量" prop="number" sortable align="center">
+      <el-table-column label="数量" prop="number" sortable align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="单位" prop="unit" sortable align="center">
+      <el-table-column label="单位" prop="unit" sortable align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.unit }}</span>
         </template>
@@ -213,7 +213,7 @@ export default {
         createTime: undefined,
         reuse: undefined,
         unit: undefined,
-        save: true
+        save: undefined
       },
       rules: {
         goodsname: [{ required: true, message: '物品名称不能为空', trigger: 'blur' }],
@@ -271,7 +271,8 @@ export default {
         purpose: undefined,
         createTime: undefined,
         reuse: undefined,
-        unit: undefined
+        unit: undefined,
+        save: undefined
       }
     },
     handleFilter() {

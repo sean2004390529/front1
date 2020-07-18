@@ -53,8 +53,8 @@
           <span>Password : 666666</span>
         </div>
         <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
+          <span style="margin-right:18px;">Username : user</span>
+          <span>Password : 666666</span>
         </div>
       </div>
     </el-form>
