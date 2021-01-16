@@ -38,7 +38,7 @@ const actions = {
         commit('SET_TOKEN', data.accessToken)
         setToken(data.accessToken)
         setRefreshToken(data.refreshToken)
-        // localStorage.setItem('Authorization', data.accessToken)
+        localStorage.setItem('Authorization', data.accessToken)
         resolve()
       }).catch(error => {
         reject(error)

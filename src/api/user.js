@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function login(data) {
   return request({
-    url: '/user/login',
+    url: '/auth/user/login',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/user/info',
+    url: '/auth/user/info',
     method: 'get',
     params: { token }
   })
@@ -18,14 +18,14 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/user/logout',
+    url: '/auth/user/logout',
     method: 'post'
   })
 }
 
 export function fetchList(data) {
   return request({
-    url: '/user/list',
+    url: '/auth/user/list',
     method: 'post',
     data
   })
@@ -33,7 +33,7 @@ export function fetchList(data) {
 
 export function createUser(data) {
   return request({
-    url: '/user',
+    url: '/auth/user',
     method: 'post',
     data
   })
@@ -41,7 +41,7 @@ export function createUser(data) {
 
 export function updateUser(data) {
   return request({
-    url: '/user',
+    url: '/auth/user',
     method: 'put',
     data
   })
@@ -64,7 +64,7 @@ export function updateRoles(data) {
 
 export function deleteUsers(data) {
   return request({
-    url: '/user',
+    url: '/auth/user',
     method: 'delete',
     data
   })

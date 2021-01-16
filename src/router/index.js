@@ -61,22 +61,28 @@ export const asyncRoutes = [
     meta: { title: '后台管理', icon: 'edit', roles: ['admin'] },
     children: [
       {
-        path: '/basic/dept',
-        name: '部门管理',
-        component: () => import('@/views/basic/dept'),
-        meta: { title: '部门管理', icon: 'tree', roles: ['admin'] }
-      },
-      {
         path: '/basic/user',
         name: '用户管理',
         component: () => import('@/views/basic/user'),
-        meta: { title: '用户管理', icon: 'user', roles: ['admin'] }
+        meta: { title: '用户管理', icon: 'people', roles: ['admin'] }
       },
       {
         path: '/basic/role',
         name: '角色管理',
         component: () => import('@/views/basic/role'),
-        meta: { title: '角色管理', icon: 'lock', roles: ['admin'] }
+        meta: { title: '角色管理', icon: 'peoples', roles: ['admin'] }
+      },
+      {
+        path: '/basic/permission',
+        name: '权限管理',
+        component: () => import('@/views/basic/permission'),
+        meta: { title: '权限管理', icon: 'tree-table', roles: ['admin'] }
+      },
+      {
+        path: '/basic/dept',
+        name: '部门管理',
+        component: () => import('@/views/basic/dept'),
+        meta: { title: '部门管理', icon: 'tree', roles: ['admin'] }
       }
     ]
   },
