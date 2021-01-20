@@ -120,15 +120,15 @@ export const asyncRoutes = [
       },
       {
         path: '/stock/disposable',
-        name: '一次性物品',
+        name: '在库一次性物品',
         component: () => import('@/views/stock/disposable'),
-        meta: { title: '一次性物品', icon: 'table' }
+        meta: { title: '在库一次性物品', icon: 'table' }
       },
       {
         path: '/stock/dispense',
-        name: '一次性分发',
+        name: '一次性分发记录',
         component: () => import('@/views/stock/dispense'),
-        meta: { title: '一次性分发', icon: 'table' }
+        meta: { title: '一次性分发记录', icon: 'table' }
       },
       {
         path: '/stock/reuse',

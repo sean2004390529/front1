@@ -187,9 +187,9 @@
 </template>
 
 <script>
-import { fetchList, createBorrow, updateBorrow, deleteBorrow, fetchAllStaff, fetchUnreturn } from '@/api/borrow'
-import { fetchUnit } from '@/api/common'
-import { fetchReuse } from '@/api/reuse'
+import { fetchList, createBorrow, updateBorrow, deleteBorrow, fetchAllStaff, fetchUnreturn } from '@/api/stock/borrow'
+import { fetchUnit } from '@/api/stock/common'
+import { fetchReuse } from '@/api/stock/reuse'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -297,8 +297,8 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.list
-        this.total = response.data.totalRows
+        this.list = response.data.records
+        this.total = response.data.total
         this.listLoading = false
       })
     },

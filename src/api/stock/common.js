@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function fetchList(data) {
   return request({
-    url: '/stock/common/units',
+    url: '/stock/common/unit/list',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function fetchList(data) {
 
 export function fetchUnit() {
   return request({
-    url: '/stock/common/units/nopage',
+    url: '/stock/common/unit/nopage',
     method: 'get'
   })
 }

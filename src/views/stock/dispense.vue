@@ -163,9 +163,9 @@
 </template>
 
 <script>
-import { fetchList, createDispense, updateDispense, deleteDispense, fetchAllStaff } from '@/api/dispense'
-import { fetchUnit } from '@/api/common'
-import { fetchDispo } from '@/api/disposable'
+import { fetchList, createDispense, updateDispense, deleteDispense, fetchAllStaff } from '@/api/stock/dispense'
+import { fetchUnit } from '@/api/stock/common'
+import { fetchDispo } from '@/api/stock/disposable'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -250,8 +250,8 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.list
-        this.total = response.data.totalRows
+        this.list = response.data.records
+        this.total = response.data.total
         this.listLoading = false
       })
     },

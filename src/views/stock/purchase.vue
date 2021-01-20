@@ -72,9 +72,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="购买日期" prop="createTime" sortable align="center">
+      <el-table-column label="购买日期" prop="purchaseTime" sortable align="center">
         <template slot-scope="{row}">
-          <span>{{ row.createTime | formatDate }}</span>
+          <span>{{ row.purchaseTime | formatDate }}</span>
         </template>
       </el-table-column>
 
@@ -128,9 +128,9 @@
         <el-form-item label="购买目的" prop="purpose">
           <el-input v-model="temp.purpose" />
         </el-form-item>
-        <el-form-item label="购买日期" prop="createTime">
+        <el-form-item label="购买日期" prop="purchaseTime">
           <el-date-picker
-            v-model="temp.createTime"
+            v-model="temp.purchaseTime"
             placeholder="请选择购买日期"
             type="date"
             :picker-options="pickerOptions"
@@ -162,8 +162,8 @@
 </template>
 
 <script>
-import { fetchList, createPurchase, updatePurchase, deletePurchase } from '@/api/purchase'
-import { fetchUnit } from '@/api/common'
+import { fetchList, createPurchase, updatePurchase, deletePurchase } from '@/api/stock/purchase'
+import { fetchUnit } from '@/api/stock/common'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -210,7 +210,7 @@ export default {
         number: undefined,
         amount: undefined,
         purpose: undefined,
-        createTime: undefined,
+        purchaseTime: undefined,
         reuse: undefined,
         unit: undefined,
         save: undefined
@@ -257,8 +257,8 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.list
-        this.total = response.data.totalRows
+        this.list = response.data.records
+        this.total = response.data.total
         this.listLoading = false
       })
     },
@@ -269,7 +269,7 @@ export default {
         number: undefined,
         amount: undefined,
         purpose: undefined,
-        createTime: undefined,
+        purchaseTime: undefined,
         reuse: undefined,
         unit: undefined,
         save: undefined
@@ -286,7 +286,7 @@ export default {
     },
     handleCreate() {
       this.resetTemp()
-      this.temp.createTime = +new Date()
+      this.temp.purchaseTime = +new Date()
       this.temp.reuse = 0
       this.temp.reuse = this.temp.reuse.toString()
       this.temp.save = true

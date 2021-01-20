@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { fetchList, createUnit, updateUnit, deleteUnit } from '@/api/common'
+import { fetchList, createUnit, updateUnit, deleteUnit } from '@/api/stock/common'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -125,8 +125,8 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.list
-        this.total = response.data.totalRows
+        this.list = response.data.records
+        this.total = response.data.total
         this.listLoading = false
       })
     },

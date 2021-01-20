@@ -28,7 +28,7 @@
         <el-option key="1" value="1" label="一般" />
       </el-select>
       <el-select v-model="listQuery.isPublic" placeholder="筛选公开状态" clearable style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option lkey="1" value="1" abel="公开" />
+        <el-option key="1" value="1" label="公开" />
         <el-option key="0" value="0" label="非公开" />
       </el-select>
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
@@ -54,7 +54,7 @@
           <span>{{ $index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="描述" prop="description" align="left" width="400">
+      <el-table-column label="描述" prop="description" align="left" width="200">
         <template slot-scope="{row}">
           <span>{{ row.description }}</span>
         </template>
@@ -81,7 +81,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="right" width="280" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="right" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-button v-if="1==row.status" size="mini" type="success" @click="handleModifyStatus(row,0)">
             标记为完成
@@ -210,8 +210,8 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.list
-        this.total = response.data.totalRows
+        this.list = response.data.records
+        this.total = response.data.total
         this.listLoading = false
       })
     },
