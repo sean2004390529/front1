@@ -151,6 +151,19 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/calendar',
+    component: Layout,
+    redirect: '/calendar',
+    children: [
+      {
+        path: 'calendar',
+        component: () => import('@/views/calendar/index'),
+        name: 'calendar',
+        meta: { title: '日程管理', icon: 'dashboard', affix: true }
+      }
+    ]
+  },
+  {
     path: 'https://www.baidu.com',
     component: Layout,
     meta: { title: '链接', icon: 'link' }
