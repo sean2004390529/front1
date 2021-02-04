@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <!--新增、搜索栏 -->
+
     <div class="filter-container">
       <el-col :span="8">
         <el-input v-model="simpleInput.description" autofocus clearable placeholder="请添加Todo项" />
@@ -35,6 +35,14 @@
         搜索
       </el-button>
     </div>
+
+    <!-- 各任务表格-->
+    <el-tabs v-model="activeTask" @tab-click="handleTaskClick">
+      <el-tab-pane label="紧急任务" name="urgent"></el-tab-pane>
+      <el-tab-pane label="所有待办事项" name="unfinish"></el-tab-pane>
+      <el-tab-pane label="已完成" name="finished"></el-tab-pane>
+      <!-- <el-tab-pane label="组任务" name="groupTask"></el-tab-pane> -->
+    </el-tabs>
 
     <!--表格 -->
     <el-table
@@ -200,10 +208,13 @@ export default {
       statusOptions: ['未完成', '完成'],
       deleteTodoList: [],
       multipleSelection: [],
-      activeNames: ['1']
+      activeName: "0",
+      activeTask: 'unfinish'
     }
   },
   created() {
+    this.listQuery.status = 1
+    this.listQuery.urgent = ''
     this.getList()
   },
   methods: {
@@ -350,6 +361,28 @@ export default {
             message: '取消删除Todo'
           })
         })
+      }
+    },
+    handleCollapseChange(val){
+      // console.log(val)
+    },
+    handleTaskClick(tab, event){
+      console.log("handleTaskClick")
+      console.log(tab)
+      if(tab.name == 'urgent'){
+        this.listQuery.status = 1
+        this.listQuery.urgent = 3
+        this.getList()
+      }
+      else if(tab.name == 'unfinish'){
+        this.listQuery.status = 1
+        this.listQuery.urgent = ''
+        this.getList()
+      }
+      else if(tab.name == 'finished'){
+        this.listQuery.status = 0
+        this.listQuery.urgent = ''
+        this.getList()
       }
     }
   }

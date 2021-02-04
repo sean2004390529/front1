@@ -2,28 +2,14 @@ import request from '@/utils/request'
 
 export function fetchList() {
   return request({
-    url: '/dept/list',
+    url: '/basic/dept/list',
     method: 'post'
-  })
-}
-
-export function fetchAllDept() {
-  return request({
-    url: '/depts',
-    method: 'get'
-  })
-}
-
-export function fetchSubDept(deptId) {
-  return request({
-    url: `/depts/sub/${deptId}`,
-    method: 'get'
   })
 }
 
 export function createDept(data) {
   return request({
-    url: '/dept',
+    url: '/basic/dept',
     method: 'post',
     data
   })
@@ -31,7 +17,7 @@ export function createDept(data) {
 
 export function updateDept(data) {
   return request({
-    url: '/dept',
+    url: '/basic/dept',
     method: 'put',
     data
   })
@@ -39,7 +25,14 @@ export function updateDept(data) {
 
 export function deleteDept(deptId) {
   return request({
-    url: `/dept/${deptId}`,
+    url: `/basic/dept/${deptId}`,
     method: 'delete',
+  })
+}
+
+export function fetchDeptFlat() {
+  return request({
+    url: '/basic/dept/flat',
+    method: 'get'
   })
 }

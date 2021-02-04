@@ -64,7 +64,7 @@ export const asyncRoutes = [
         path: '/basic/user',
         name: '用户管理',
         component: () => import('@/views/basic/user'),
-        meta: { title: '用户管理', icon: 'people', roles: ['admin'] }
+        meta: { title: '用户管理', icon: 'user', roles: ['admin'] }
       },
       {
         path: '/basic/role',
@@ -83,6 +83,12 @@ export const asyncRoutes = [
         name: '部门管理',
         component: () => import('@/views/basic/dept'),
         meta: { title: '部门管理', icon: 'tree', roles: ['admin'] }
+      },
+      {
+        path: '/basic/emp',
+        name: '员工管理',
+        component: () => import('@/views/basic/emp'),
+        meta: { title: '员工管理', icon: 'people', roles: ['admin'] }
       }
     ]
   },

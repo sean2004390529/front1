@@ -26,7 +26,6 @@ export default {
     return {
       title: '非 盈 利 企 业 OA 平 台',
       logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
-      // logo: require('../../../assets/LOGO1.PNG')
     }
   }
 }
