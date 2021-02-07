@@ -38,3 +38,17 @@ export function fetchsubDeptEmp(deptId) {
     method: 'get'
   })
 }
+
+export function fetchManagerEmp() {
+  return request({
+    url: `/basic/emp/manager`,
+    method: 'get'
+  })
+}
+
+export function fetchMemberEmp() {
+  return request({
+    url: `/basic/emp/member`,
+    method: 'get'
+  })
+}

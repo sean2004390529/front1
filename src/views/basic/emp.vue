@@ -2,19 +2,30 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.empName" placeholder="搜索名字" style="width: 120px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.sex" placeholder="搜索性别" style="width: 120px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.phone" placeholder="搜索电话" style="width: 120px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.mobile" placeholder="搜索手机号" style="width: 120px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.title" placeholder="搜索职位" style="width: 100px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.manager" placeholder="项目负责人" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option key="1" value="1" label="是" />
+        <el-option key="0" value="0" label="否" />
+      </el-select>
+      <el-select v-model="listQuery.member" placeholder="项目成员" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option key="1" value="1" label="是" />
+        <el-option key="0" value="0" label="否" />
+      </el-select>
+      
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
         搜素
+      </el-button>
+      <el-button class="filter-item" type="info" icon="el-icon-circle-close" @click="clearFilter">
+        清除筛选
       </el-button>
       <br>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh" @click="getList">
-        刷新
+        刷新所有员工
       </el-button>
       <el-button  class="filter-item" type="primary" icon="el-icon-folder" @click="handleSelectSubDeptEmp">
         按部门显示员工
@@ -37,7 +48,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column label="序号" sortable align="center" width="90px">
+      <el-table-column label="序号" sortable align="center" width="50px">
         <template slot-scope="{row, $index}">
           <span>{{ $index + 1 }}</span>
         </template>
@@ -67,7 +78,7 @@
           <span>{{ row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部门" prop="deptId" sortable align="center">
+      <el-table-column label="部门" prop="deptId" sortable align="center" width="120px">
         <template slot-scope="{row}">
           <el-select v-model="row.deptId" disabled=true>
             <el-option
@@ -79,20 +90,16 @@
           </el-select>
         </template>
       </el-table-column>
-      <el-table-column label="禁用/启用" width="150px" align="center">
+      <el-table-column label="禁用/启用" width="80px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.status | formatStatus }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
-            修改
-          </el-button>
-          <el-button size="mini" type="danger" icon="el-icon-delete-solid" @click="handleDelete(row,$index)">
-            删除
-          </el-button>
+          <el-tag @click="handleUpdate(row,$index)">修改</el-tag>
+          <el-tag @click="handleDelete(row,$index)" type="danger" >删除</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -103,7 +110,7 @@
 
     <!-- 编辑框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="ID" prop="id" hidden>
           <el-input v-model="temp.id" />
         </el-form-item>
@@ -134,6 +141,18 @@
             <el-option label="女" value="0" />
           </el-select>
         </el-form-item>
+        <el-form-item label="项目负责人" prop="manager">
+          <el-select v-model="temp.manager" placeholder="请选择可否">
+            <el-option label="是" value="1" />
+            <el-option label="否" value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="项目组员" prop="member">
+          <el-select v-model="temp.member" placeholder="请选择可否">
+            <el-option label="是" value="1" />
+            <el-option label="否" value="0" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="部门" prop="deptId">
           <el-select v-model="temp.deptId" placeholder="请选择部门"  >
             <el-option
@@ -159,12 +178,15 @@
 
     <!-- 部门 抽屉 -->
     <el-drawer
-      title="请选择部门"
       :visible.sync="drawer"
       direction="ltr"
-      :with-header="false"
+      :show-close="false"
       @open="handleOpen"
       >
+      <div slot="title" >
+        <el-alert title="请选择部门" type="success"></el-alert>
+      </div>
+
       <!-- 部门树 -->
       <el-tree ref="tree"
         :data="deptList"
@@ -211,10 +233,11 @@ export default {
         pageNum: 1,
         pageSize: 20,
         empName: undefined,
-        sex: undefined,
         phone: undefined,
         mobile: undefined,
-        title: undefined
+        title: undefined,
+        manager: undefined,
+        member: undefined
       },
       defaultProps: {
         children: 'children',
@@ -236,6 +259,8 @@ export default {
         email: undefined,
         status: 1,
         sex: 1,
+        manager: 0,
+        member: 0,
         deptId: undefined
       },
       rules: {
@@ -280,11 +305,26 @@ export default {
         email: undefined,
         status: 1,
         sex: 1,
+        manager: 0,
+        member: 0,
         deptId: undefined
       }
     },
     handleFilter() {
       this.listQuery.pageNum = 1
+      this.getList()
+    },
+    clearFilter() {
+      this.listQuery = {
+        pageNum: 1,
+        pageSize: 20,
+        empName: undefined,
+        phone: undefined,
+        mobile: undefined,
+        title: undefined,
+        manager: undefined,
+        member: undefined
+      },
       this.getList()
     },
     handleCheckChange(data, checked, indeterminate) {
@@ -314,6 +354,8 @@ export default {
       this.resetTemp()
       this.temp.status = this.temp.status.toString()
       this.temp.sex = this.temp.sex.toString()
+      this.temp.manager = this.temp.manager.toString()
+      this.temp.member = this.temp.member.toString()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -342,6 +384,8 @@ export default {
     handleUpdate(row, index) {
       row.status = row.status.toString()
       row.sex = row.sex.toString()
+      row.manager = row.manager.toString()
+      row.member = row.member.toString()
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -427,7 +471,7 @@ export default {
     },
     handleOpen(){
       // this.getDeptList()
-    },
+    }
 
   }
 }

@@ -107,6 +107,26 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/project',
+    component: Layout,
+    redirect: '/project/overall',
+    meta: { title: '项目管理', icon: 'skill' },
+    children: [
+      {
+        path: '/project/overall',
+        name: '项目总览',
+        component: () => import('@/views/project/overall'),
+        meta: { title: '项目总览', icon: 'skill' }
+      },
+      {
+        path: '/project/demand',
+        name: '项目进度',
+        component: () => import('@/views/project/demand'),
+        meta: { title: '项目进度', icon: 'skill' }
+      }
+    ]
+  },
+  {
     path: '/stock',
     component: Layout,
     redirect: '/stock/reuse',

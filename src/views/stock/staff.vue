@@ -16,7 +16,7 @@
       <el-input v-model="listQuery.email" placeholder="搜索邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.phone" placeholder="搜索电话" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
-        Search
+        搜索
       </el-button>
       <el-button class="filter-item" type="info" icon="el-icon-circle-close" @click="clearFilter">
         清除筛选

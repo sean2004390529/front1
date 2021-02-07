@@ -271,8 +271,13 @@ export default {
       this.getList()
     },
     clearFilter() {
-      this.listQuery.goodsname = undefined
-      this.listQuery.personId = undefined
+      this.listQuery = {
+        pageNum: 1,
+        pageSize: 20,
+        goodsname: undefined,
+        purpose: undefined,
+        personId: undefined
+      },
       this.getList()
     },
     fetchAllStaff() {

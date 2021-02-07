@@ -34,6 +34,9 @@
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
+      <el-button class="filter-item" type="info" icon="el-icon-circle-close" @click="clearFilter">
+        清除筛选
+      </el-button>
     </div>
 
     <!-- 各任务表格-->
@@ -89,20 +92,12 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="right" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding">
         <template slot-scope="{row,$index}">
-          <el-button v-if="1==row.status" size="mini" type="success" @click="handleModifyStatus(row,0)">
-            标记为完成
-          </el-button>
-          <el-button v-if="0==row.status" size="mini" type="info" @click="handleModifyStatus(row,1)">
-            标记为未完成
-          </el-button>
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
-            修改
-          </el-button>
-          <el-button size="mini" type="danger" icon="el-icon-delete-solid" @click="handleDelete(row,$index)">
-            删除
-          </el-button>
+          <el-tag v-if="1==row.status" type="success" @click="handleModifyStatus(row,0)">标记为完成</el-tag>
+          <el-tag v-if="0==row.status" type="info" @click="handleModifyStatus(row,1)">标记为未完成</el-tag>
+          <el-tag @click="handleUpdate(row,$index)">修改</el-tag>
+          <el-tag @click="handleDelete(row,$index)" type="danger" >删除</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -196,7 +191,7 @@ export default {
         id: undefined,
         description: '',
         status: '',
-        urgent: 1,
+        urgent: '',
         result: '',
         isPublic: ''
       },
@@ -214,6 +209,7 @@ export default {
   },
   created() {
     this.listQuery.status = 1
+    this.listQuery.status = this.listQuery.status.toString()
     this.listQuery.urgent = ''
     this.getList()
   },
@@ -228,6 +224,18 @@ export default {
     },
     handleFilter() {
       this.listQuery.pageNum = 1
+      this.getList()
+    },
+    clearFilter() {
+      this.listQuery = {
+        pageNum: 1,
+        pageSize: 20,
+        description: undefined,
+        result: undefined,
+        status: '',
+        urgent: '',
+        isPublic: ''
+      },
       this.getList()
     },
     resetSimpleInput() {
@@ -367,20 +375,22 @@ export default {
       // console.log(val)
     },
     handleTaskClick(tab, event){
-      console.log("handleTaskClick")
-      console.log(tab)
       if(tab.name == 'urgent'){
         this.listQuery.status = 1
+        this.listQuery.status = this.listQuery.status.toString()
         this.listQuery.urgent = 3
+        this.listQuery.urgent = this.listQuery.urgent.toString()
         this.getList()
       }
       else if(tab.name == 'unfinish'){
         this.listQuery.status = 1
+        this.listQuery.status = this.listQuery.status.toString()
         this.listQuery.urgent = ''
         this.getList()
       }
       else if(tab.name == 'finished'){
         this.listQuery.status = 0
+        this.listQuery.status = this.listQuery.status.toString()
         this.listQuery.urgent = ''
         this.getList()
       }
