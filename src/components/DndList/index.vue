@@ -82,7 +82,6 @@ export default {
       if (this.isNotInList2(ele)) {
         this.list2.unshift(ele)
       }
-      console.log(this.list1)
     },
     pushEle(ele) {
       for (const item of this.list2) {
@@ -95,7 +94,6 @@ export default {
       if (this.isNotInList1(ele)) {
         this.list1.push(ele)
       }
-      console.log(this.list1)
     },
     setData(dataTransfer) {
       // to avoid Firefox bug

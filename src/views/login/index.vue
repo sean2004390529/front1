@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import { loginOauth, login } from '@/api/user'
 
 export default {
   name: 'Login',
@@ -134,6 +135,14 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          // 新增以下
+          login(this.loginForm).then( res =>{
+            console.log("loginSuccess",res)
+          })
+          .catch( res =>{
+            console.log("error", res)
+          })
+          //新增以上
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
               // 重定向，并保留query参数

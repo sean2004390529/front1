@@ -1,10 +1,37 @@
 import request from '@/utils/request'
 
 export function login(data) {
+  const clientId = 'nginx'
+  const clientSecret = 'nginx'
+  const tokenBase64 = "Basic " + Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64')
+  const username = data.username
+  const password = data.password
+
   return request({
-    url: '/auth/user/login',
+    url: `/auth/login?username=${username}&password=${password}`,
     method: 'post',
+    headers:{
+      Authorization: tokenBase64
+    },
     data
+  })
+}
+
+export function loginOauth(data) {
+  const clientId = 'nginx'
+  const clientSecret = 'nginx'
+  const tokenBase64 = "Basic " + Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64')
+  const username = data.username
+  const password = data.password
+
+  return request({
+    url: `/auth/oauth/token?grant_type=password&scope=all&username=${username}&password=${password}`,
+    // url: `/auth/oauth/token?grant_type=password&scope=all`,
+    method: 'post',
+    headers:{
+      Authorization: tokenBase64
+    }
+    // data
   })
 }
 

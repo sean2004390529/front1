@@ -96,7 +96,7 @@ export const asyncRoutes = [
     path: '/todo',
     component: Layout,
     redirect: '/todo/todo',
-    meta: { title: 'Todo', icon: 'list' },
+    meta: { title: 'Todo', icon: 'list', roles: ['admin','todoRole'] },
     children: [
       {
         path: '/todo/todo',
@@ -110,7 +110,7 @@ export const asyncRoutes = [
     path: '/project',
     component: Layout,
     redirect: '/project/overall',
-    meta: { title: '项目管理', icon: 'skill' },
+    meta: { title: '项目管理', icon: 'skill', roles: ['admin','projectRole'] },
     children: [
       {
         path: '/project/overall',
@@ -130,7 +130,7 @@ export const asyncRoutes = [
     path: '/stock',
     component: Layout,
     redirect: '/stock/reuse',
-    meta: { title: '物品管理', icon: 'table' },
+    meta: { title: '物品管理', icon: 'table', roles: ['admin','stockRole'] },
     children: [
       {
         path: '/stock/staff',
@@ -180,12 +180,13 @@ export const asyncRoutes = [
     path: '/calendar',
     component: Layout,
     redirect: '/calendar',
+    meta: { title: '日程管理', icon: 'component', roles: ['admin','calendarRole'] },
     children: [
       {
         path: 'calendar',
         component: () => import('@/views/calendar/index'),
         name: 'calendar',
-        meta: { title: '日程管理', icon: 'dashboard', affix: true }
+        meta: { title: '日程管理', icon: 'component', affix: true }
       }
     ]
   },

@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, loginOauth } from '@/api/user'
 import { getToken, setToken, removeToken, setRefreshToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
@@ -33,14 +33,14 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.accessToken)
-        setToken(data.accessToken)
-        setRefreshToken(data.refreshToken)
-        localStorage.setItem('Authorization', data.accessToken)
+      loginOauth({ username: username.trim(), password: password }).then(response => {
+        commit('SET_TOKEN',"Bearer " + response.access_token)
+        setToken("Bearer " + response.access_token)
+        setRefreshToken("Bearer " + response.refresh_token)
+        localStorage.setItem('Authorization', "Bearer " + response.access_token)
         resolve()
       }).catch(error => {
+        console.log("store - loginOauth - error")
         reject(error)
       })
     })
@@ -51,7 +51,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo().then(response => {
         const { data } = response
-
         if (!data) {
           reject('Verification failed, please Login again.')
         }
@@ -67,6 +66,7 @@ const actions = {
         // commit('SET_INTRODUCTION', introduction)
         resolve(data)
       }).catch(error => {
+        console.log("getInfo - error")
         reject(error)
       })
     })
