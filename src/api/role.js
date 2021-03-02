@@ -32,3 +32,25 @@ export function deleteRoles(data) {
     data
   })
 }
+
+export function fetchAllRole() {
+  return request({
+    url: '/auth/role/fetchallrole',
+    method: 'get'
+  })
+}
+
+export function fetchYourRole(userId) {
+  return request({
+    url: `/auth/role/yourrole/${userId}`,
+    method: 'get'
+  })
+}
+
+export function updateYourRole(data) {
+  return request({
+    url: '/auth/role/updateyourrole',
+    method: 'post',
+    data
+  })
+}

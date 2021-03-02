@@ -27,6 +27,7 @@
       highlight-current-row
       style="width: 100%;"
       @selection-change="handleSelectionChange"
+      @cell-click="handleCellClick"
     >
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" sortable align="center" width="90px">
@@ -49,21 +50,12 @@
           <span>{{ row.status | formatStatus }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期" width="150px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.createTime | formatDate }}</span>
-        </template>
-      </el-table-column>
 
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
-            修改
-          </el-button>
-
-          <el-button size="mini" type="danger" icon="el-icon-delete-solid" @click="handleDelete(row,$index)">
-            删除
-          </el-button>
+          <el-tag @click.stop="handleUpdate(row,$index)">修改</el-tag>
+          <el-tag @click.stop="handleDelete(row,$index)" type="danger" >删除</el-tag>
+          <el-tag @click.stop="getPermission(row,$index)" type="success" >分配权限</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -92,7 +84,7 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
+        <el-button @click="cancel">
           取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
@@ -100,11 +92,47 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <!-- 分配权限 -->
+    <el-dialog title="分配权限" :visible.sync="PermissionFormVisible" fullscreen=true>
+      <el-form :model="tempRole" label-position="left" label-width="80px" style="margin-left:50px;">
+        <el-form-item label="ID" prop="roleId" >
+          <el-input v-model="tempRole.roleId" disabled />
+        </el-form-item>
+        <el-form-item label="角色名" prop="name">
+          <el-input v-model="tempRole.name" disabled />
+        </el-form-item>
+
+        <el-form-item label="分配角色">
+          <el-transfer 
+            v-model="selectedPermission" 
+            :data="allPermissionList"
+            :titles="['可选权限','已分配权限']"
+            @change="handlePermissionChange"
+          >
+            <span slot-scope="{ option }">
+              {{ option.label }}
+            </span>
+          </el-transfer>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="PermissionFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="updateYourPermission()">
+          分配角色
+        </el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import { fetchList, createRole, updateRole, deleteRoles } from '@/api/role'
+import { fetchAllPermission, fetchYourPermission, updateYourPermission } from '@/api/permission'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -152,11 +180,19 @@ export default {
         name: [{ required: true, message: '角色名字必填', trigger: 'blur' }]
       },
       deleteRoleList: [],
-      multipleSelection: []
+      multipleSelection: [],
+      PermissionFormVisible: false,
+      tempRole: {
+        roleId: undefined,
+        name: ''
+      },
+      allPermissionList: [],
+      selectedPermission: []
     }
   },
   created() {
     this.getList()
+    this.fetchAllPermission()
   },
   methods: {
     getList() {
@@ -184,6 +220,10 @@ export default {
         description: '',
         status: 1
       }
+    },
+    handleFilter() {
+      this.listQuery.pageNum = 1
+      this.getList()
     },
     handleCreate() {
       this.resetTemp()
@@ -213,9 +253,8 @@ export default {
         this.getList()
       }, 500)
     },
-    handleFilter() {
-      this.listQuery.pageNum = 1
-      this.getList()
+    handleCellClick(row){
+      this.handleUpdate(row)
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -293,11 +332,71 @@ export default {
           })
         })
       }
+    },
+    resettempRole() {
+      this.tempRole = {
+        roleId: undefined,
+        name: ''
+      }
+    },
+    fetchAllPermission(){
+      fetchAllPermission().then(req =>{
+        const allPermissionData = req.data
+        const data = []
+        for(let i=0; i< allPermissionData.length; i++){
+          data.push({
+            key: allPermissionData[i].id,
+            label: allPermissionData[i].name
+          })
+        }
+        this.allPermissionList = data;
+      })
+    },
+    getPermission(row, index) {
+      this.resettempRole()
+      this.selectedPermission = []
+      this.tempRole.roleId = row.id
+      this.tempRole.name = row.name
+      fetchYourPermission(row.id).then(res => {
+        if(res.data!=null){
+          this.selectedPermission = res.data
+        }
+        this.PermissionFormVisible = true
+      })
+      
+    },
+    handlePermissionChange(){
+      console.log("selectedPermission",this.selectedPermission)
+    },
+    updateYourPermission() {
+      const roleId = this.tempRole.roleId
+      const permissionId = this.selectedPermission
+      updateYourPermission({roleId, permissionId }).then(response => {
+        this.$notify({
+          title: '成功',
+          message: '分配权限成功',
+          type: 'success',
+          duration: 5000
+        })
+        this.PermissionFormVisible = false
+        this.selectedPermission = []
+      }).catch( ()=>{
+        this.$message({
+          type: 'info',
+          message: '分配权限失败',
+          duration: 5000
+        })
+      })
+    },
+    cancel(){
+      this.dialogFormVisible = false
+      this.getList()
     }
   }
 }
 </script>
 
-<style>
+<style >
 
 </style>
+

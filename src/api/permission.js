@@ -32,3 +32,25 @@ export function deletePermission(data) {
     data
   })
 }
+
+export function fetchAllPermission() {
+  return request({
+    url: '/auth/permission/fetchallpermission',
+    method: 'get'
+  })
+}
+
+export function fetchYourPermission(userId) {
+  return request({
+    url: `/auth/permission/yourPermission/${userId}`,
+    method: 'get'
+  })
+}
+
+export function updateYourPermission(data) {
+  return request({
+    url: '/auth/permission/updateyourpermission',
+    method: 'post',
+    data
+  })
+}

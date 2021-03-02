@@ -94,10 +94,10 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding">
         <template slot-scope="{row,$index}">
-          <el-tag v-if="1==row.status" type="success" @click="handleModifyStatus(row,0)">标记为完成</el-tag>
-          <el-tag v-if="0==row.status" type="info" @click="handleModifyStatus(row,1)">标记为未完成</el-tag>
-          <el-tag @click="handleUpdate(row,$index)">修改</el-tag>
-          <el-tag @click="handleDelete(row,$index)" type="danger" >删除</el-tag>
+          <el-tag v-if="1==row.status" type="success" @click.stop="handleModifyStatus(row,0)">标记为完成</el-tag>
+          <el-tag v-if="0==row.status" type="info" @click.stop="handleModifyStatus(row,1)">标记为未完成</el-tag>
+          <el-tag @click.stop="handleUpdate(row,$index)">修改</el-tag>
+          <el-tag @click.stop="handleDelete(row,$index)" type="danger" >删除</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -244,6 +244,14 @@ export default {
       }
     },
     addTodo() {
+      const inputData = this.simpleInput.description
+      if(inputData==null || inputData =="" ){
+        this.$message({
+          type: 'info',
+          message: 'Todo内容不能为空'
+        })
+        return
+      }
       createTodo(this.simpleInput).then(() => {
         this.$message({
           type: 'success',
@@ -256,7 +264,7 @@ export default {
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: 'Todo内容不能为空'
+          message: '添加Todo失败'
         })
       })
     },

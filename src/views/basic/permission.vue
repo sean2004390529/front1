@@ -9,12 +9,18 @@
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDeletePermission">
         批量删除
-      </el-button>
-      <el-input v-model="listQuery.name" placeholder="搜索权限名" style="width: 80px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.remark" placeholder="搜索描述" style="width: 80px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.url" placeholder="搜索url" style="width: 80px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      </el-button><br>
+      <el-input v-model="listQuery.name" placeholder="搜索权限名" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" clearable @clear="getList()" />
+      <el-input v-model="listQuery.code" placeholder="搜索描述" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" clearable @clear="getList()" />
+      <el-input v-model="listQuery.url" placeholder="搜索url" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" clearable @clear="getList()" />
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
         Search
+      </el-button>
+      <el-button class="filter-item" type="info" icon="el-icon-circle-close" @click="clearFilter">
+        清除筛选
       </el-button>
     </div>
 
@@ -28,6 +34,7 @@
       highlight-current-row
       style="width: 100%;"
       @selection-change="handleSelectionChange"
+      @cell-click="handleCellClick"
     >
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" sortable align="center" width="50px">
@@ -40,9 +47,9 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="描述" prop="remark" sortable align="center">
+      <el-table-column label="权限标识符" prop="code" sortable align="center">
         <template slot-scope="{row}">
-          <span>{{ row.remark }}</span>
+          <span>{{ row.code }}</span>
         </template>
       </el-table-column>
       <el-table-column label="url" prop="url" sortable align="center">
@@ -61,15 +68,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row,$index)">
-            修改
-          </el-button>
-
-          <el-button size="mini" type="danger" icon="el-icon-delete-solid" @click="handleDelete(row,$index)">
-            删除
-          </el-button>
+          <el-tag @click.stop="handleUpdate(row,$index)">修改</el-tag>
+          <el-tag @click.stop="handleDelete(row,$index)" type="danger" >删除</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -86,9 +88,6 @@
         <el-form-item label="权限名" prop="name">
           <el-input v-model="temp.name" placeholder="请输入权限名" />
         </el-form-item>
-        <el-form-item label="描述" prop="remark">
-          <el-input v-model="temp.remark" placeholder="请输入描述信息" />
-        </el-form-item>
         <el-form-item label="url" prop="url">
           <el-input v-model="temp.url" placeholder="请输入url信息" />
         </el-form-item>
@@ -101,7 +100,7 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
+        <el-button @click="cancel">
           取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
@@ -142,7 +141,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: undefined,
-        remark: undefined,
+        code: undefined,
         url: undefined
       },
       dialogFormVisible: false,
@@ -154,7 +153,7 @@ export default {
       temp: {
         id: undefined,
         name: '',
-        remark: '',
+        code: '',
         url: '',
         status: 1,
         createTime: new Date()
@@ -178,21 +177,21 @@ export default {
         this.listLoading = false
       })
     },
-    handleUpdate(row, index) {
-      row.status = row.status.toString()
-      this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+    clearFilter() {
+      this.listQuery = {
+        pageNum: 1,
+        pageSize: 10,
+        name: undefined,
+        code: undefined,
+        url: undefined
+      },
+      this.getList()
     },
+
     resetTemp() {
       this.temp = {
         id: undefined,
         name: '',
-        remark: '',
         url: '',
         status: 1
       }
@@ -229,11 +228,22 @@ export default {
       this.listQuery.pageNum = 1
       this.getList()
     },
+    handleCellClick(row){
+      this.handleUpdate(row)
+    },
+    handleUpdate(row, index) {
+      row.status = row.status.toString()
+      this.temp = Object.assign({}, row) // copy obj
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          // tempData.updateTime = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updatePermission(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
@@ -305,6 +315,10 @@ export default {
           })
         })
       }
+    },
+    cancel(){
+      this.dialogFormVisible = false
+      this.getList()
     }
   }
 }

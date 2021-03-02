@@ -74,21 +74,6 @@ export function updateUser(data) {
   })
 }
 
-export function fetchRoles(userId) {
-  return request({
-    url: `/user/roles/${userId}`,
-    method: 'get'
-  })
-}
-
-export function updateRoles(data) {
-  return request({
-    url: '/user/roles',
-    method: 'put',
-    data
-  })
-}
-
 export function deleteUsers(data) {
   return request({
     url: '/auth/user',

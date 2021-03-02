@@ -186,7 +186,7 @@ export const asyncRoutes = [
         path: 'calendar',
         component: () => import('@/views/calendar/index'),
         name: 'calendar',
-        meta: { title: '日程管理', icon: 'component', affix: true }
+        meta: { title: '日程管理', icon: 'component' }
       }
     ]
   },

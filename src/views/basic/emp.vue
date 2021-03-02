@@ -98,8 +98,8 @@
 
       <el-table-column label="操作" align="center" class-name="small-padding">
         <template slot-scope="{row,$index}">
-          <el-tag @click="handleUpdate(row,$index)">修改</el-tag>
-          <el-tag @click="handleDelete(row,$index)" type="danger" >删除</el-tag>
+          <el-tag @click.stop="handleUpdate(row,$index)">修改</el-tag>
+          <el-tag @click.stop="handleDelete(row,$index)" type="danger" >删除</el-tag>
         </template>
       </el-table-column>
     </el-table>

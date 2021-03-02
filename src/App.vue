@@ -9,3 +9,13 @@ export default {
   name: 'App'
 }
 </script>
+
+<style>
+  .el-checkbox{
+    display: block;
+  }
+  
+  .el-transfer-panel {
+    width: 40%;
+  }
+</style>
