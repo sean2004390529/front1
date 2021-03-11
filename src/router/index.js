@@ -191,6 +191,20 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/activity',
+    component: Layout,
+    redirect: '/activity',
+    meta: { title: '流程管理', icon: 'component', roles: ['admin','activiti_user'] },
+    children: [
+      {
+        path: 'activity',
+        component: () => import('@/views/activity/definition'),
+        name: 'activity',
+        meta: { title: '流程部署', icon: 'bug' }
+      }
+    ]
+  },
+  {
     path: 'https://www.baidu.com',
     component: Layout,
     meta: { title: '链接', icon: 'link' }

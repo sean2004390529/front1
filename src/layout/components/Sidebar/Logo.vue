@@ -26,7 +26,7 @@ export default {
     return {
       title: '可 定 制 企 业 OA 平 台',
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
-      logo: 'LOGO.PNG' //后台nginx配置问题，未成功
+      logo: 'LOGO.PNG'
     }
   }
 }
