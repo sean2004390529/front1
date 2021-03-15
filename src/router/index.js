@@ -198,7 +198,7 @@ export const asyncRoutes = [
     children: [
       {
         path: 'activity',
-        component: () => import('@/views/activity/definition'),
+        component: () => import('@/views/activity/deployment'),
         name: 'activity',
         meta: { title: '流程部署', icon: 'bug' }
       }
