@@ -5,7 +5,7 @@ module.exports = {
    * @type {boolean} true | false
    * @description 是否显示右侧悬浮配置按钮
    */
-  showSettings: true,
+  showSettings: false,
 
   /**
    * @type {boolean} true | false

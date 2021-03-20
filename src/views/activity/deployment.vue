@@ -13,8 +13,9 @@
         :before-upload="beforeUpload"
         :file-list="fileList"
         :auto-upload="false">
-        <el-button slot="trigger" size="small" type="primary" icon="el-icon-files" >选取bpmn文件</el-button>
-        <el-button style="margin-left: 10px;" size="small" type="success" icon="el-icon-upload" @click="submitUpload">上传并部署</el-button>
+        <el-button slot="trigger" size="small" type="primary" icon="el-icon-files" >选取bpmn文件(bug)</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="success" icon="el-icon-upload" @click="submitUpload">上传并部署(bug)</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="success" icon="el-icon-upload" @click="enableLeave">启动请假</el-button>
         <el-button style="margin-left: 10px;" type="primary" icon="el-icon-delete" @click="clearSystemDeployment">清除系统部署</el-button>
         <el-button style="margin-left: 10px;" type="primary" icon="el-icon-refresh" @click="getList">刷新</el-button>
         <el-button style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDelete">批量删除</el-button>
@@ -48,6 +49,11 @@
           <span>{{ row.description }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="上传次数" prop="version" sortable align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.version }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="部署日期" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.deploymentTime | formatDate }}</span>
@@ -66,7 +72,7 @@
 </template>
 
 <script>
-import { clear, fetchList, deleteDeployment } from '@/api/activiti/deployment'
+import { clear, fetchList, deleteDeployment, enableLeave } from '@/api/activiti/deployment'
 import { formatDate } from '@/utils'
 
 export default {
@@ -100,7 +106,8 @@ export default {
       deployTemp: {
         id: undefined,
         name: '',
-        deploymentTime: ''
+        deploymentTime: '',
+        version: ''
       },
       deleteList: [],
       multipleSelection: [],
@@ -123,12 +130,12 @@ export default {
     },
     beforeUpload(file){
       const extName = file.name.split('.')[1]
-      if(extName !="bpmn"){
-        this.$message.error("请上传[.bpmn]格式文件")
-      }
-      else{
+      // if(extName !="bpmn"){
+      //   this.$message.error("请上传[.bpmn]格式文件")
+      // }
+      // else{
         return true
-      }
+      // }
     },
     clearSystemDeployment(){
       clear()
@@ -198,6 +205,19 @@ export default {
         })
       }
     },
+    enableLeave(){
+      enableLeave().then(() => {
+        this.$message({
+          type: 'success',
+          message: '启动部署成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '启动部署失败'
+        })
+      })
+    }
   }
 }
 </script>

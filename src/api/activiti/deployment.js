@@ -22,3 +22,9 @@ export function deleteDeployment(data) {
   })
 }
 
+export function enableLeave() {
+  return request({
+    url: '/activity/deployment/enableleave',
+    method: 'post',
+  })
+}

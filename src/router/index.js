@@ -193,14 +193,33 @@ export const asyncRoutes = [
   {
     path: '/activity',
     component: Layout,
-    redirect: '/activity',
+    redirect: '/activity/process',
     meta: { title: '流程管理', icon: 'component', roles: ['admin','activiti_user'] },
     children: [
       {
-        path: 'activity',
+        path: '/activity/activity',
         component: () => import('@/views/activity/deployment'),
         name: 'activity',
-        meta: { title: '流程部署', icon: 'bug' }
+        meta: { title: '流程部署', icon: 'bug', roles: ['activiti_user'] }
+      },
+      {
+        path: '/activity/process',
+        meta: { title: '申请', icon: 'bug' },
+        component: () => import('@/views/activity/process/index'),
+        children: [
+          {
+            path: '/activity/process/leave',
+            name: '请假申请',
+            component: () => import('@/views/activity/process/leave'),
+            meta: { title: '请假申请', icon: 'bug' }
+          },
+          {
+            path: '/activity/process/OT',
+            name: '加班申请',
+            component: () => import('@/views/activity/process/ot'),
+            meta: { title: '加班申请', icon: 'bug' }
+          }
+        ]
       }
     ]
   },
