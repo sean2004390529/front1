@@ -97,18 +97,12 @@ export default {
       //   name: undefined,
       //   description: undefined
       // },
-      dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: '编辑',
-        create: '创建'
-      },
-      deployTemp: {
-        id: undefined,
-        name: '',
-        deploymentTime: '',
-        version: ''
-      },
+      // dialogFormVisible: false,
+      // dialogStatus: '',
+      // textMap: {
+      //   update: '编辑',
+      //   create: '创建'
+      // },
       deleteList: [],
       multipleSelection: [],
     };

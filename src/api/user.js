@@ -81,3 +81,19 @@ export function deleteUsers(data) {
     data
   })
 }
+
+export function assignCorp(data) {
+  return request({
+    url: '/auth/user/assigncorp',
+    method: 'post',
+    data
+  })
+}
+
+export function bindEmp(data) {
+  return request({
+    url: '/auth/user/bindemp',
+    method: 'post',
+    data
+  })
+}

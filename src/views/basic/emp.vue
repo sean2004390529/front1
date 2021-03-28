@@ -14,9 +14,7 @@
         <el-option key="0" value="0" label="否" />
       </el-select>
       
-      <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
-        搜素
-      </el-button>
+      <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter"></el-button>
       <el-button class="filter-item" type="info" icon="el-icon-circle-close" @click="clearFilter">
         清除筛选
       </el-button>

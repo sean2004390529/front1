@@ -137,7 +137,7 @@ import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'Roles',
+  name: 'Role',
   components: { Pagination },
   filters: {
     formatDate(time) {

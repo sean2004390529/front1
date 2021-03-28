@@ -202,9 +202,22 @@ export default {
     };
   },
   methods: {
+    resetTemp() {
+      this.temp = {
+        title: '○月○日休暇申請',
+        type: '',
+        leaveDate: '',
+        leaveDays: '',
+        remark: '',
+        manager: '',
+        hr: ''
+      }
+    },
     submit(){
       console.log("submit ", this.temp)
       submit(this.temp).then(() => {
+        this.active = 0
+        this.resetTemp()
         this.$notify({
           title: '成功',
           message: '申请提交成功',

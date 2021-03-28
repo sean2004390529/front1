@@ -8,6 +8,9 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh" @click="getList">
         刷新
       </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="success" icon="el-icon-s-flag" @click="batchAssignCorp">
+        批量分配企业
+      </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDeleteUser">
         批量删除
       </el-button><br>
@@ -18,6 +21,16 @@
         @keyup.enter.native="handleFilter" clearable @clear="getList()" />
       <el-input v-model="listQuery.phone" placeholder="搜索电话" style="width: 200px;" class="filter-item" 
         @keyup.enter.native="handleFilter" clearable @clear="getList()" />
+      <el-select v-model="listQuery.corpCode" clearable placeholder="筛选企业" style="width: 200px;" class="filter-item">
+        <el-option 
+          v-for="item in options"
+          :key="item.code"
+          :label="item.name"
+          :value="item.code"
+          @focus="handleFilter"
+          >
+        </el-option>
+      </el-select>
       <el-button class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
@@ -46,19 +59,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="用户名" prop="username" sortable align="center" width="150px">
+      <el-table-column label="用户名" prop="username" sortable align="center" width="100px">
         <template slot-scope="{row}">
           <span>{{ row.username }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="email" prop="email" sortable align="center" width="250px">
+      <el-table-column label="email" prop="email" sortable align="center" width="100px">
         <template slot-scope="{row}">
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="电话号码" prop="phone" sortable align="center" width="150px">
+      <el-table-column label="电话号码" prop="phone" sortable align="center" width="100px">
         <template slot-scope="{row}">
           <span>{{ row.phone }}</span>
         </template>
@@ -76,11 +89,25 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="企业名称" prop="corpName" sortable align="center" width="150px">
+        <template slot-scope="{row}">
+          <span>{{ row.corpName }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="员工名" prop="empName" sortable align="center" width="150px">
+        <template slot-scope="{row}">
+          <span>{{ row.empName }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-tag @click.stop="handleUpdate(row,$index)">修改</el-tag>
           <el-tag @click.stop="handleDelete(row,$index)" type="danger" >删除</el-tag>
           <el-tag @click.stop="getRole(row,$index)" type="success" >分配角色</el-tag>
+          <el-tag @click.stop="handleAssignCorp(row,$index)" type="info" >分配企业</el-tag>
+          <el-tag @click.stop="handleBindEmp(row,$index)" type="warning" >绑定员工</el-tag>
         </template>
       </el-table-column>
 
@@ -157,12 +184,90 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <!-- 绑定员工 -->
+    <el-dialog title="绑定员工" :visible.sync="EmpFormVisible" >
+      <el-form :model="tempEmp" label-position="left" label-width="80px" style="margin-left:50px;">
+        <el-form-item label="ID" hidden>
+          <el-input v-model="tempEmp.userId" disabled />
+        </el-form-item>
+        <el-form-item label="用户名" >
+          <el-input v-model="tempEmp.username" disabled />
+        </el-form-item>
+        <el-form-item label="企业名" >
+          <el-input v-model="tempEmp.corpName" disabled />
+        </el-form-item>
+        <el-form-item label="员工名" >
+          <el-select v-model="tempEmp.empName" clearable placeholder="选择绑定的员工"
+            value-key="item" @change="empChange"
+          >
+            <el-option 
+              v-for="(item,idx) in empOptions"
+              :key="idx"
+              :label="item.empName"
+              :value="item"
+              >
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="EmpFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="bindEmp()">
+          绑定员工
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 企业抽屉 -->
+    <el-drawer
+      :visible.sync="drawer"
+      :show-close="false"
+      @open="handleOpen"
+      >
+
+      <div slot="title" >
+        <el-alert title="请选择分配的企业" type="success"></el-alert>
+      </div>
+
+      <el-table
+        :key="corpTableKey"
+        v-loading="corpTableLoading"
+        :data="corpTableList"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+        :row-class-name="corpTableClassName"
+        @cell-click="handleCorpTableClick"
+      >
+        <el-table-column label="企业名称" sortable align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="英文名" sortable align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.enname }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-drawer>
+
+    
+
   </div>
 </template>
 
 <script>
-import { fetchList, createUser, updateUser,  deleteUsers } from '@/api/user'
+import { fetchList, createUser, updateUser,  deleteUsers, assignCorp, bindEmp } from '@/api/user'
 import { fetchAllRole, fetchYourRole, updateYourRole } from '@/api/role'
+import { loadCorpTableList } from '@/api/corp'
+import { loadEmpList } from '@/api/emp'
 import { formatDate } from '@/utils'
 import Pagination from '@/components/Pagination'
 
@@ -188,10 +293,11 @@ export default {
       list: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         username: undefined,
         email: undefined,
-        phone: undefined
+        phone: undefined,
+        corpCode: undefined
       },
       total: 0,
       dialogFormVisible: false,
@@ -213,6 +319,7 @@ export default {
         password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
       },
       deleteUserList: [],
+      assignCorpUserList: [],
       multipleSelection: [],
       RoleFormVisible: false,
       tempUser: {
@@ -220,12 +327,28 @@ export default {
         username: ''
       },
       allRoleList: [],
-      selectedRole: []
+      selectedRole: [],
+      corpTableKey: 0,
+      corpTableTotal: 0,
+      corpTableList: [],
+      corpTableLoading: false,
+      drawer: false,
+      options: [],
+      empOptions: [],
+      EmpFormVisible: false,
+      tempEmp: {
+        userId: undefined,
+        corpCode: undefined,
+        corpName: undefined,
+        empId: undefined,
+        empName: undefined
+      },
     }
   },
   created() {
     this.getList()
     this.fetchAllRole()
+    this.loadCorpTableList()
   },
   methods: {
     getList() {
@@ -245,6 +368,15 @@ export default {
         status: 1
       }
     },
+    resetEmpTemp() {
+      this.tempEmp = {
+        userId: undefined,
+        corpCode: undefined,
+        corpName: undefined,
+        empId: undefined,
+        empName: undefined
+      }
+    },
     handleCellClick(row){
       this.handleUpdate(row)
     },
@@ -260,7 +392,8 @@ export default {
         pageSize: 10,
         username: undefined,
         email: undefined,
-        phone: undefined
+        phone: undefined,
+        corpName: undefined
       },
       this.getList()
     },
@@ -435,6 +568,75 @@ export default {
     cancel(){
       this.dialogFormVisible = false
       this.getList()
+    },
+    handleOpen(){
+      // this.getDeptList()
+    },
+    loadCorpTableList () {
+      this.corpTableLoading = true
+      loadCorpTableList().then(response => {
+        this.corpTableList = response.data
+        this.options = response.data
+        this.corpTableLoading = false
+      })
+    },
+    handleAssignCorp(row, index){
+      this.assignCorpUserList = []
+      this.assignCorpUserList.push(row.id)
+      this.drawer = true
+    },
+    handleCorpTableClick(row){
+      let corpCode = row.code
+      let corpName = row.name
+      let userIdlist = this.assignCorpUserList
+      assignCorp({userIdlist, corpCode, corpName}).then( resp =>{
+        this.drawer = false
+        this.getList()
+      })
+    },
+    batchAssignCorp(test){
+      this.assignCorpUserList = []
+      this.multipleSelection.forEach(item =>{
+        this.assignCorpUserList.push(item.id)
+      })
+      if(this.assignCorpUserList.length === 0){
+        this.$message('没有选中用户')
+      }else {
+        this.drawer = true
+      }
+    },
+    handleBindEmp(row, index){
+      console.log("handleBindEmp - row", row)
+      this.resetEmpTemp()
+      this.tempEmp.userId = row.id
+      this.tempEmp.username = row.username
+      this.tempEmp.corpCode = row.corpCode
+      this.tempEmp.corpName = row.corpName
+      loadEmpList(row.corpCode).then(response => {
+        this.empOptions = response.data
+      })
+      this.EmpFormVisible = true
+    },
+    empChange(value){
+      console.log("empChange - value ", value)
+      this.tempEmp.empId = value.id
+      this.tempEmp.empName = value.empName
+    },
+    bindEmp(){
+      console.log("bindEmp tempEmp", this.tempEmp)
+      bindEmp(this.tempEmp).then(()=>{
+        this.getList()
+        this.EmpFormVisible = false
+        this.$message({
+          type: 'success',
+          message: '绑定用户成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '绑定用户失败'
+        })
+      })
     }
   }
 }

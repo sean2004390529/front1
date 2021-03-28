@@ -32,6 +32,8 @@ export function deleteEmp(data) {
   })
 }
 
+
+
 export function fetchsubDeptEmp(deptId) {
   return request({
     url: `/basic/emp/${deptId}`,
@@ -49,6 +51,14 @@ export function fetchManagerEmp() {
 export function fetchMemberEmp() {
   return request({
     url: `/basic/emp/member`,
+    method: 'get'
+  })
+}
+
+
+export function loadEmpList(corpCode) {
+  return request({
+    url: `/basic/emp/corp/${corpCode}`,
     method: 'get'
   })
 }

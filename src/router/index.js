@@ -79,6 +79,12 @@ export const asyncRoutes = [
         meta: { title: '权限管理', icon: 'tree-table', roles: ['admin'] }
       },
       {
+        path: '/basic/corp',
+        name: '企业管理',
+        component: () => import('@/views/basic/corp'),
+        meta: { title: '企业管理', icon: 'component', roles: ['admin'] }
+      },
+      {
         path: '/basic/dept',
         name: '部门管理',
         component: () => import('@/views/basic/dept'),
@@ -193,14 +199,26 @@ export const asyncRoutes = [
   {
     path: '/activity',
     component: Layout,
-    redirect: '/activity/process',
-    meta: { title: '流程管理', icon: 'component', roles: ['admin','activiti_user'] },
+    redirect: '/activity/task',
+    meta: { title: '流程管理', icon: 'component'},
     children: [
       {
         path: '/activity/activity',
         component: () => import('@/views/activity/deployment'),
         name: 'activity',
-        meta: { title: '流程部署', icon: 'bug', roles: ['activiti_user'] }
+        meta: { title: '流程部署', icon: 'bug', roles: ['admin','activiti_admin'] }
+      },
+      {
+        path: '/activity/instance',
+        component: () => import('@/views/activity/instance'),
+        name: '流程实例',
+        meta: { title: '流程实例', icon: 'bug', roles: ['admin','activiti_admin'] }
+      },
+      {
+        path: '/activity/task',
+        component: () => import('@/views/activity/task'),
+        name: '待办任务',
+        meta: { title: '待办任务', icon: 'bug' }
       },
       {
         path: '/activity/process',
