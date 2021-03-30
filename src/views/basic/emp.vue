@@ -285,11 +285,13 @@ export default {
     },
     getDeptList(){
       fetchDeptList().then(response => {
+        console.log("fetchDeptList - resp", response)
         this.deptList = response.data
       })
     },
     getDeptOptionList(){
       fetchDeptFlat().then(response => {
+        console.log("fetchDeptFlat - resp", response)
         this.deptOption = response.data
       })
     },

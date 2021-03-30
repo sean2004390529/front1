@@ -14,6 +14,7 @@
 
     <!-- 部门树 -->
     <el-row :gutter="20">
+      <!-- 部门树 -->
       <el-col :span="10">
         <el-tree ref="tree"
         :data="list"
@@ -28,12 +29,14 @@
           <span>{{ node.label }}</span>
           <span v-if="changeMode">
             <el-button v-if="node.isLeaf" type="text" size="mini" @click="() => handleDelete(node, data)">删除</el-button>
-            <el-button type="text" size="mini" @click="() => handleAdd(data)">添加子部门</el-button>
-            <el-button type="text" size="mini" @click.stop="() => handleUdate(data)">修改部门名称</el-button>
+            <el-button type="text" size="mini" @click.stop="() => handleAdd(data)">添加子部门</el-button>
+            <el-button type="text" size="mini" @click.stop="() => handleUpdate(data)">修改部门名称</el-button>
           </span>
         </span>
       </el-tree>
-    </el-col>
+      </el-col>
+
+      <!-- 功能键 -->
       <el-col :span="10" :offset="2" v-if="dialogFormVisible">
         <el-form ref="dataForm" :model="temp" :rules="rules" label-width="80px">
           <el-form-item label="部门id">
@@ -55,11 +58,28 @@
       </el-col>
     </el-row>
 
+    <div class="margin-top">
+        <el-divider content-position="left">
+          <i class="el-icon-user-solid" />
+          所属员工
+        </el-divider>
+    </div>
+    <!--员工列表 -->
+    <el-row v-if="!changeMode">
+
+      <el-tag class="margin" size="medium"
+        v-for="tag in empTag"
+        :key="tag.id">
+        {{tag.empName}}
+      </el-tag>
+    </el-row>
+
   </div>
 </template>
 
 <script>
 import { fetchList, createDept, updateDept, deleteDept } from '@/api/dept'
+import { fetchsubDeptEmp } from '@/api/emp'
 
 export default {
   name: 'Department',
@@ -84,7 +104,8 @@ export default {
       rules: {
         deptName: [{ required: true, message: '部门名称必填', trigger: 'blur' }],
         parentId: [{ required: true, message: '所属部门必点', trigger: 'blur' }]
-      }
+      },
+      empTag: []
     }
   },
   created() {
@@ -110,13 +131,30 @@ export default {
       this.addMode=true
     },
     handleCheckChange(data, checked, indeterminate) {
-      console.log(data)
+      // console.log(data)
     },
     handleNodeClick(data) {
-      this.temp.parentId = data.id
-      this.temp.parentName = data.deptName
+      if(this.addMode && this.dialogFormVisible){
+        this.temp.parentId = data.id
+        this.temp.parentName = data.deptName
+        this.temp.id = undefined,
+        this.temp.deptName = undefined
+      } else if(!this.addMode && this.dialogFormVisible){
+        this.temp.id = data.id
+        this.temp.deptName = data.deptName
+        this.temp.parentId = undefined,
+        this.temp.parentName = undefined
+      } else {
+        this.resetTemp()
+        this.temp.id = data.id
+        fetchsubDeptEmp(this.temp.id).then(res =>{
+          this.empTag = res.data
+        })
+      }
+
     },
     handleAdd(data){
+      this.resetTemp()
       this.addMode=true
       this.temp.parentId = data.id
       this.temp.parentName = data.deptName
@@ -134,13 +172,13 @@ export default {
             })
           })
           this.resetTemp()
+          setTimeout(() => {
+            this.getList()
+          }, 500)
         }
       })
-      setTimeout(() => {
-        this.getList()
-      }, 500)
     },
-    handleUdate(data){
+    handleUpdate(data){
       this.resetTemp()
       this.temp.id = data.id
       this.temp.deptName = data.deptName
@@ -211,4 +249,11 @@ export default {
     }
   }
 
+  .margin{
+    margin-left: 10px;
+  }
+
+  .margin-top {
+    margin-top: 20px;
+  }
 </style>

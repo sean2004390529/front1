@@ -40,6 +40,7 @@
             :picker-options="pickerOptions"
             :default-time="['09:00:00', '18:00:00']"
             clearable
+            @change="dateChange"
           />
         </el-form-item>
 
@@ -168,6 +169,7 @@
 
 <script>
 import { submit } from '@/api/activiti/process/leave'
+import { parseTime } from '@/utils'
 
 export default {
   name: "Leave",
@@ -228,6 +230,16 @@ export default {
           // this.getList()
         }, 500)
       })
+    },
+    dateChange(val){
+      let diftime = (val[1]-val[0])/1000/60/60
+      let day = 0
+      if(diftime<5){
+        day = 0.5
+      }else {
+        day = Math.floor(diftime/24) + 1
+      }
+      this.temp.leaveDays =  day
     }
   }
 }
