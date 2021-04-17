@@ -6,185 +6,168 @@
       <el-steps :active="active" finish-status="success" >
         <el-step icon="el-icon-edit" title="填写申请"></el-step>
         <el-step icon="el-icon-s-check" title="选择审批人"></el-step>
-        <el-step icon="el-icon-s-promotion" title="提交确认"></el-step>
       </el-steps>
     </div>
 
-    <!-- 填写申请-->
-    <div v-show="active==0">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" >
-        <el-form-item label="标题" prop="title">
-          <el-col :span="11">
-            <el-input v-model="temp.title" />
+    <div class="marginTop">
+      <!-- 填写申请 step0 -->
+      <div v-show="active==0">
+        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" >
+          <el-form-item label="标题" prop="title">
+            <el-col :span="11">
+              <el-input v-model="temp.title" />
+            </el-col>
+          </el-form-item>
+          <el-form-item label="休假" prop="type">
+            <el-select v-model="temp.type" placeholder="请选择休假种类">
+              <el-option label="年假" value="0" />
+              <el-option label="病假" value="1" />
+              <el-option label="换休" value="2" />
+              <el-option label="产假" value="3" />
+              <el-option label="婚假" value="4" />
+              <el-option label="丧假" value="5" />
+              <el-option label="事假" value="6" />
+              <el-option label="其他" value="7" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="请假日期" prop="leaveDate">
+            <el-date-picker
+              v-model="temp.leaveDate"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              type="datetimerange"
+              :picker-options="pickerOptions"
+              :default-time="['09:00:00', '18:00:00']"
+              clearable
+              @change="dateChange"
+            />
+          </el-form-item>
+
+          <el-form-item label="休假天数" prop="title">
+            <el-col :span="4">
+              <el-input-number :min="0" v-model="temp.leaveDays" />
+            </el-col>
+          </el-form-item>
+          <el-form-item label="备注" prop="reason">
+            <el-col :span="11">
+              <el-input type="textarea" v-model="temp.reason" placeholder="请输入请假备注" />
+            </el-col>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="nextStep">下一步</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
+      <!-- 选择审批人 step1 -->
+      <div v-show="active==1">
+        <el-form ref="leaderForm" :rules="leaderRules" :model="temp" label-position="left" label-width="120px" >
+          <el-form-item label="主管审批" prop="managerName">
+            <el-select v-model="temp.managerName" clearable placeholder="请选择主管" value-key="item" @change="managerChange">
+              <el-option
+                v-for="(item,idx) in managerOptions"
+                :key="idx"
+                :label="item.empName"
+                :value="item">
+              </el-option>
+            </el-select>
+            <el-button icon="el-icon-user-solid" @click="handleSelectEmp('manager')">选择部门</el-button>
+          </el-form-item>
+
+          <el-form-item label="人事部审批"  prop="hrName">
+            <el-select v-model="temp.hrName" placeholder="选择人事部员工" value-key="item" @change="hrChange">
+              <el-option
+                v-for="(item,idx) in hrOptions"
+                :key="idx"
+                :label="item.empName"
+                :value="item">
+              </el-option>
+            </el-select>
+            <el-button icon="el-icon-user-solid" @click="handleSelectEmp('hr')">选择部门</el-button>
+          </el-form-item>
+
+          <el-form-item label="总经理审批" v-show="temp.leaveDays>=5">
+            <el-select v-model="temp.ceoName" placeholder="选择总经理" value-key="item" @change="ceoChange">
+              <el-option
+                v-for="(item,idx) in ceoOptions"
+                :key="idx"
+                :label="item.empName"
+                :value="item">
+              </el-option>
+            </el-select>
+            <el-button icon="el-icon-user-solid" @click="handleSelectEmp('ceo')">选择部门</el-button>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" @click="submit">保存请假单</el-button>
+            <el-button @click="active=0">返回</el-button>
+          </el-form-item>
+      </div>
+
+      <!-- 部门树 step1-->
+      <!-- 选择特殊员工处理申请 -->
+      <div v-show="showEmp && active==1">
+        <div v-if="!deptList">
+          <el-button @click="fetchDeptList">刷新部门列表</el-button>
+        </div>
+
+        <div v-else>
+          <el-col :span="10">
+            <el-tree ref="tree"
+            :data="deptList"
+            node-key="id"
+            :props="defaultProps"
+            highlight-current
+            default-expand-all
+            :expand-on-click-node="false"
+            @node-click="handleNodeClick"
+            >
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <span>{{ node.label }}</span>
+              </span>
+            </el-tree>
           </el-col>
-        </el-form-item>
-        <el-form-item label="休假" prop="type">
-          <el-select v-model="temp.type" placeholder="请选择休假种类">
-            <el-option label="年假" value="1" />
-            <el-option label="病假" value="2" />
-            <el-option label="换休" value="3" />
-            <el-option label="产假" value="4" />
-            <el-option label="婚假" value="5" />
-            <el-option label="丧假" value="6" />
-            <el-option label="事假" value="11" />
-            <el-option label="其他" value="12" />
-          </el-select>
-        </el-form-item>
 
-        <el-form-item label="请假日期" prop="leaveDate">
-          <el-date-picker
-            v-model="temp.leaveDate"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            type="datetimerange"
-            :picker-options="pickerOptions"
-            :default-time="['09:00:00', '18:00:00']"
-            clearable
-            @change="dateChange"
-          />
-        </el-form-item>
-
-        <el-form-item label="休假天数" prop="title">
-          <el-col :span="4">
-            <el-input-number :min="0" v-model="temp.leaveDays" />
+          <el-col :span="10">
+            <el-row >
+              <el-tag class="marginLeft" size="medium" @click="tagClick(tag.id, tag.empName)"
+                v-for="tag in tagOptions"
+                :key="tag.id">
+                {{tag.empName}}
+              </el-tag>
+            </el-row>
           </el-col>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-col :span="11">
-            <el-input type="textarea" v-model="temp.remark" placeholder="请输入请假备注" />
-          </el-col>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="active=1">下一步</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
+        </div>
+      </div>
 
-    <!-- 选择审批人-->
-    <div v-show="active==1">
-      <!-- mock员工 -->
-      <el-form ref="leaderForm" :rules="leaderRules" :model="temp" label-position="left" label-width="100px" >
-        <el-form-item label="主管审批" prop="manager">
-          <el-select v-model="temp.manager" placeholder="请选择审批的主管">
-            <el-option
-              v-for="item in managerOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="人事部审批" prop="hr">
-          <el-select v-model="temp.hr" placeholder="请选择审批的人事部员工">
-            <el-option
-              v-for="item in hrOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <!-- 部门树 -->
-        <!-- 选择特殊员工处理申请 -->
-        <el-form-item>
-          <el-button type="primary" @click="active=2">下一步</el-button>
-          <el-button @click="active=0">返回</el-button>
-        </el-form-item>
-    </div>
-
-    <!-- 提交确认-->
-    <div v-show="active==2">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" >
-        <el-form-item label="标题" prop="title">
-          <el-col :span="11">
-            <el-input v-model="temp.title" disabled />
-          </el-col>
-        </el-form-item>
-        <el-form-item label="休假" prop="type">
-          <el-select v-model="temp.type" placeholder="请选择休假种类" disabled>
-            <el-option label="年假" value="1" />
-            <el-option label="病假" value="2" />
-            <el-option label="换休" value="3" />
-            <el-option label="产假" value="4" />
-            <el-option label="婚假" value="5" />
-            <el-option label="丧假" value="6" />
-            <el-option label="事假" value="11" />
-            <el-option label="其他" value="12" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="请假日期" prop="leaveDate">
-          <el-date-picker
-            v-model="temp.leaveDate"
-            type="datetimerange"
-            :picker-options="pickerOptions"
-            :default-time="['09:00:00', '18:00:00']"
-            disabled
-          />
-        </el-form-item>
-
-        <el-form-item label="休假天数" prop="title">
-          <el-col :span="4">
-            <el-input-number :min="0" v-model="temp.leaveDays" disabled />
-          </el-col>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-col :span="11">
-            <el-input type="textarea" v-model="temp.remark" placeholder="请输入请假备注" disabled />
-          </el-col>
-        </el-form-item>
-
-        <el-form-item label="主管审批" prop="manager">
-          <el-select v-model="temp.manager" placeholder="请选择审批的主管" disabled >
-            <el-option
-              v-for="item in managerOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="人事部审批" prop="hr">
-          <el-select v-model="temp.hr" placeholder="请选择审批的人事部员工" disabled >
-            <el-option
-              v-for="item in hrOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" @click="submit">确认申请</el-button>
-          <el-button @click="active=0">返回</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
+    <div>
   </div>
 </template>
 
 <script>
 import { submit } from '@/api/activiti/process/leave'
-import { parseTime } from '@/utils'
+import { fetchList as fetchDeptList } from '@/api/dept'
+import { fetchsubDeptEmp } from '@/api/emp'
+import { fecthSpecialemp } from '@/api/activiti/specialemp'
 
 export default {
   name: "Leave",
-
   data() {
     return {
       active: 0,
       temp: {
         title: '○月○日休暇申請',
-        type: '',
-        leaveDate: '',
-        leaveDays: '',
-        remark: '',
-        manager: '',
-        hr: ''
+        type: undefined,
+        leaveDate: undefined,
+        leaveDays: undefined,
+        reason: undefined,
+        managerId: undefined,
+        managerName: undefined,
+        hrId: undefined,
+        hrName: undefined,
+        ceoId: undefined,
+        ceoName: undefined
       },
       rules: {
         title: [{ required: true, message: '标题不能为空', trigger: 'change' }],
@@ -192,46 +175,78 @@ export default {
         leaveDate: [{ required: true, message: '请假天数不能为空', trigger: 'blur' }],
         leaveDays: [{ required: true, message: '请假天数不能为空', trigger: 'blur' }]
       },
-      // mock假数据
-      managerOptions: [
-        {value: 'staffid-111', label: '久住吕'},
-        {value: 'staffid-222', label: '加菲'},
-      ],
-      hrOptions: [
-        {value: 'staffid-333', label: '李菲菲'},
-        {value: 'staffid-444', label: '唐飞飞'}
-      ]
+      leaderRules: {
+        managerName: [{ required: true, message: '主管不能为空', trigger: 'blur' }],
+        hrName: [{ required: true, message: 'HR不能为空', trigger: 'blur' }],
+      },
+      whoApprove: '',
+      managerOptions: [],
+      hrOptions: [],
+      ceoOptions: [],
+      tagOptions: [],
+      showEmp: false,
+      deptId: undefined,
+      deptList: null,
+      defaultProps: {
+        children: 'children',
+        label: 'deptName'
+      },
+      
     };
+  },
+  created() {
+    this.fecthSpecialemp()
   },
   methods: {
     resetTemp() {
       this.temp = {
         title: '○月○日休暇申請',
-        type: '',
-        leaveDate: '',
-        leaveDays: '',
-        remark: '',
-        manager: '',
-        hr: ''
+        type: undefined,
+        leaveDate: undefined,
+        leaveDays: undefined,
+        reason: undefined,
+        managerId: undefined,
+        managerName: undefined,
+        hrId: undefined,
+        hrName: undefined,
+        ceoId: undefined,
+        ceoName: undefined
+      }
+    },
+    checkStep1(){
+      this.permitSubmit = false
+      this.$refs['dataForm'].validate((valid) => {
+        if(valid){
+          this.permitSubmit = true
+        }
+      })
+    },
+    nextStep(){
+      this.checkStep1()
+      if(this.permitSubmit){
+        this.active = 1
       }
     },
     submit(){
-      console.log("submit ", this.temp)
-      submit(this.temp).then(() => {
-        this.active = 0
-        this.resetTemp()
-        this.$notify({
-          title: '成功',
-          message: '申请提交成功',
-          type: 'success',
-          duration: 5000
-        })
-        setTimeout(() => {
-          // this.getList()
-        }, 500)
+      this.checkStep1()
+      this.$refs['leaderForm'].validate((valid) => {
+        if(valid && this.permitSubmit){
+          submit(this.temp).then(() => {
+            this.resetTemp()
+            this.$notify({
+              title: '成功',
+              message: '保存申请成功（未正式提交）',
+              type: 'success',
+              duration: 5000
+            })
+            setTimeout(() => {
+              this.$router.push({path:"/activity/task"})
+            }, 500)
+          })
+        }
       })
     },
-    dateChange(val){
+    dateChange(val){ //自动计算请假天数
       let diftime = (val[1]-val[0])/1000/60/60
       let day = 0
       if(diftime<5){
@@ -240,11 +255,96 @@ export default {
         day = Math.floor(diftime/24) + 1
       }
       this.temp.leaveDays =  day
+    },
+    fetchDeptList(){
+      fetchDeptList().then(res =>{
+        this.deptList = res.data
+      })
+    },
+    handleSelectEmp(tag){
+      // 注入tag
+      this.whoApprove = tag
+      this.showEmp = true
+      this.fetchDeptList()
+    },
+    handleNodeClick(data) {
+      this.deptId = data.id
+      fetchsubDeptEmp(this.deptId).then(res =>{
+        this.tagOptions = res.data
+        if(this.whoApprove=='manager'){
+          this.managerOptions = res.data
+        }else if(this.whoApprove=='hr'){
+          this.hrOptions = res.data
+        }else if(this.whoApprove=='ceo'){
+          this.ceoOptions = res.data
+        }
+      })
+    },
+    tagClick(empId, empName){
+      // 根据tag，判断现在是设定主管 还是 hr审批
+      if(this.whoApprove=='manager'){
+        this.temp.managerId = empId
+        this.temp.managerName = empName
+      }else if(this.whoApprove=='hr'){
+        this.temp.hrId = empId
+        this.temp.hrName = empName
+      }else if(this.whoApprove=='ceo'){
+        this.temp.ceoId = empId
+        this.temp.ceoName = empName
+      }
+      this.showEmp = false
+    },
+    managerChange(val){
+      this.temp.managerId = val.id
+      this.temp.managerName = val.empName
+      this.showEmp = false
+    },
+    hrChange(val){
+      this.temp.hrId = val.id
+      this.temp.hrName = val.empName
+      this.showEmp = false
+    },
+    ceoChange(val){
+      this.temp.ceoId = val.id
+      this.temp.ceoName = val.empName
+      this.showEmp = false
+    },
+    fecthSpecialemp(){
+      fecthSpecialemp('hr').then(res =>{
+        this.temp.hrId = res.data.empId
+        this.temp.hrName = res.data.empName
+      })
+      fecthSpecialemp('ceo').then(res =>{
+        this.temp.ceoId = res.data.empId
+        this.temp.ceoName = res.data.empName
+      })
     }
   }
 }
 </script>
 
 <style>
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+  }
 
+  .el-row {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .marginLeft {
+    margin-left: 10px;
+  }
+
+  .marginTop {
+    margin-top: 10px;
+  }
 </style>

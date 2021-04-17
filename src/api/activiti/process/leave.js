@@ -1,24 +1,49 @@
 import request from '@/utils/request'
 
-export function submit(data) {
+export function fetchLeaveHistory(data) {
   return request({
-    url: '/activity/process/leave',
+    url: '/act/process/leave/history',
     method: 'post',
     data
   })
 }
 
-// export function clear() {
-//   return request({
-//     url: '/activity/deployment/clear',
-//     method: 'get'
-//   })
-// }
+export function submit(data) {
+  return request({
+    url: '/act/process/leave',
+    method: 'post',
+    data
+  })
+}
 
-// export function deleteDeployment(data) {
-//   return request({
-//     url: '/activity/deployment',
-//     method: 'delete',
-//     data
-//   })
-// }
+export function approveLeaveRequest(data) {
+  return request({
+    url: '/act/process/leave/approve',
+    method: 'post',
+    data
+  })
+}
+
+export function returnLeaveRequest(data) {
+  return request({
+    url: '/act/process/leave/return',
+    method: 'post',
+    data
+  })
+}
+
+export function rejectLeaveRequest(data) {
+  return request({
+    url: '/act/process/leave/reject',
+    method: 'post',
+    data
+  })
+}
+
+export function showLeaveInfo(leaveId) {
+  return request({
+    url: `/act/process/leave/show/${leaveId}`,
+    method: 'get'
+  })
+}
+

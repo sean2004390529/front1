@@ -390,3 +390,7 @@ export function removeClass(ele, cls) {
   }
 }
 
+
+export function formatAssignee(name) {
+  return name.split(":")[1]
+}

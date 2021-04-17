@@ -66,7 +66,6 @@
     </div>
     <!--员工列表 -->
     <el-row v-if="!changeMode">
-
       <el-tag class="margin" size="medium"
         v-for="tag in empTag"
         :key="tag.id">

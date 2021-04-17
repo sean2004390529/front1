@@ -215,6 +215,12 @@ export const asyncRoutes = [
         meta: { title: '流程实例', icon: 'bug', roles: ['admin','activiti_admin'] }
       },
       {
+        path: '/activity/specialemp',
+        component: () => import('@/views/activity/specialemp'),
+        name: '特殊员工',
+        meta: { title: '特殊员工', icon: 'bug', roles: ['admin','activiti_admin'] }
+      },
+      {
         path: '/activity/task',
         component: () => import('@/views/activity/task'),
         name: '待办任务',
@@ -236,9 +242,27 @@ export const asyncRoutes = [
             name: '加班申请',
             component: () => import('@/views/activity/process/ot'),
             meta: { title: '加班申请', icon: 'bug' }
+          },
+          {
+            path: '/activity/process/absent',
+            name: '直行直归申请',
+            component: () => import('@/views/activity/process/absent'),
+            meta: { title: '直行直归申请', icon: 'bug' }
+          },
+          {
+            path: '/activity/process/late',
+            name: '迟到早退',
+            component: () => import('@/views/activity/process/late'),
+            meta: { title: '迟到早退', icon: 'bug' }
           }
         ]
-      }
+      },
+      {
+        path: '/activity/history',
+        component: () => import('@/views/activity/history'),
+        name: '历史申请',
+        meta: { title: '历史申请', icon: 'bug' }
+      },
     ]
   },
   {

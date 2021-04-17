@@ -74,6 +74,12 @@ export default {
     return {
       listLoading: true,
       list: null,
+      listQuery: {
+        pageNum: 1,
+        pageSize: 20,
+      //   name: undefined,
+      //   description: undefined
+      },
       deleteInstanceList: []
     }
   },
@@ -83,7 +89,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList().then(response => {
+      fetchList(this.listQuery).then(response => {
         this.list = response.data
         this.listLoading = false
       })

@@ -13,16 +13,15 @@
         :before-upload="beforeUpload"
         :file-list="fileList"
         :auto-upload="false">
-        <el-button slot="trigger" size="small" type="primary" icon="el-icon-files" >选取bpmn文件(bug)</el-button>
-        <el-button style="margin-left: 10px;" size="small" type="success" icon="el-icon-upload" @click="submitUpload">上传并部署(bug)</el-button>
-        <el-button style="margin-left: 10px;" size="small" type="success" icon="el-icon-upload" @click="enableLeave">启动请假</el-button>
-        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-delete" @click="clearSystemDeployment">清除系统部署</el-button>
+        <el-button slot="trigger" size="small" type="primary" icon="el-icon-files" >选取zip格式bpmn文件</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="success" icon="el-icon-upload" @click="submitUpload">上传并部署</el-button>
         <el-button style="margin-left: 10px;" type="primary" icon="el-icon-refresh" @click="getList">刷新</el-button>
+        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-delete" @click="clearSystemDeployment">清除系统部署</el-button>
         <el-button style="margin-left: 10px;" type="danger" icon="el-icon-delete-solid" @click="batchDelete">批量删除</el-button>
       </el-upload>
     </div>
 
-    <!-- 表格 -->
+    <!-- 表格 act_re_deployment -->
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -32,6 +31,7 @@
       highlight-current-row
       style="width: 100%;"
       @selection-change="handleSelectionChange"
+      @cell-click="handleCellClick"
     >
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" sortable align="center" width="90px">
@@ -42,11 +42,6 @@
       <el-table-column label="流程名" prop="name" sortable align="center">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="描述" prop="description" sortable align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.description }}</span>
         </template>
       </el-table-column>
       <el-table-column label="上传次数" prop="version" sortable align="center">
@@ -67,13 +62,44 @@
       </el-table-column>
     </el-table>
     
+    <!-- 分页 -->
+    <Pagination v-show="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="getList" />
+
+
+    <!-- 显示 act_re_procdef -->
+    <el-dialog title="绑定员工" :visible.sync="ProcessDefinitonVisible" >
+      <el-form :model="tempDefiniton" label-position="left" label-width="100px" style="margin-left:50px;">
+        <el-form-item label="ID" hidden>
+          <el-input v-model="tempDefiniton.id" disabled />
+        </el-form-item>
+        <el-form-item label="部署名" >
+          <el-input v-model="tempDefiniton.name" disabled />
+        </el-form-item>
+        <el-form-item label="部署key" >
+          <el-input v-model="tempDefiniton.key" disabled />
+        </el-form-item>
+        <el-form-item label="bpmn文件名" >
+          <el-input v-model="tempDefiniton.resourceName" disabled />
+        </el-form-item>
+        <el-form-item label="图片名" >
+          <el-input v-model="tempDefiniton.diagramResourceName" disabled />
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="ProcessDefinitonVisible = false">
+          取消
+        </el-button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
 
 <script>
-import { clear, fetchList, deleteDeployment, enableLeave } from '@/api/activiti/deployment'
+import { clear, fetchList, deleteDeployment, getDefinition } from '@/api/activiti/deployment'
 import { formatDate } from '@/utils'
+import Pagination from '@/components/Pagination'
 
 export default {
   name: 'ActivitiDeployment',
@@ -86,25 +112,25 @@ export default {
     return {
       fileList: [],
       uploadData:{},
-      uploadUrl: "https://seancloud.tech:8000/api/activity/deployment/upload",
+      uploadUrl: "https://seancloud.tech:8000/api/act/deploy/upload",
       tableKey: 0,
       total: 0,
       listLoading: true,
       list: null,
-      // listQuery: {
-      //   pageNum: 1,
-      //   pageSize: 10,
-      //   name: undefined,
-      //   description: undefined
-      // },
-      // dialogFormVisible: false,
-      // dialogStatus: '',
-      // textMap: {
-      //   update: '编辑',
-      //   create: '创建'
-      // },
+      listQuery: {
+        pageNum: 1,
+        pageSize: 20,
+      },
       deleteList: [],
       multipleSelection: [],
+      ProcessDefinitonVisible: false,
+      tempDefiniton: {
+        id: undefined,
+        name: undefined,
+        key: undefined,
+        resourceName: undefined,
+        diagramResourceName: undefined
+      }
     };
   },
   created() {
@@ -120,16 +146,25 @@ export default {
       setTimeout(() => {
         this.$refs.upload.clearFiles();
         this.getList()
-      }, 100);
+      }, 500);
     },
     beforeUpload(file){
       const extName = file.name.split('.')[1]
-      // if(extName !="bpmn"){
-      //   this.$message.error("请上传[.bpmn]格式文件")
-      // }
-      // else{
+      if(extName !="zip"){
+        this.$message.error("请上传[.zip]格式文件")
+      }
+      else{
         return true
-      // }
+      }
+    },
+    resetDefiniton(){
+      this.tempDefiniton = {
+        id: undefined,
+        name: undefined,
+        key: undefined,
+        resourceName: undefined,
+        diagramResourceName: undefined
+      }
     },
     clearSystemDeployment(){
       clear()
@@ -199,17 +234,11 @@ export default {
         })
       }
     },
-    enableLeave(){
-      enableLeave().then(() => {
-        this.$message({
-          type: 'success',
-          message: '启动部署成功!'
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '启动部署失败'
-        })
+    handleCellClick(row){
+      this.resetDefiniton()
+      getDefinition(row.id).then(res =>{
+        this.tempDefiniton = res.data
+        this.ProcessDefinitonVisible = true
       })
     }
   }

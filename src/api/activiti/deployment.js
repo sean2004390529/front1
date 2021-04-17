@@ -2,29 +2,36 @@ import request from '@/utils/request'
 
 export function fetchList() {
   return request({
-    url: '/activity/deployment/list',
-    method: 'post',
+    url: '/act/deploy/list',
+    method: 'post'
   })
 }
 
 export function clear() {
   return request({
-    url: '/activity/deployment/clear',
+    url: '/act/deploy/clear',
     method: 'get'
   })
 }
 
 export function deleteDeployment(data) {
   return request({
-    url: '/activity/deployment',
+    url: '/act/deploy',
     method: 'delete',
     data
   })
 }
 
-export function enableLeave() {
+export function getDefinition(deploymentId) {
   return request({
-    url: '/activity/deployment/enableleave',
-    method: 'post',
+    url: `/act/deploy/${deploymentId}`,
+    method: 'get'
   })
 }
+
+// export function enableLeave() {
+//   return request({
+//     url: '/act/deploy/enableleave',
+//     method: 'post',
+//   })
+// }

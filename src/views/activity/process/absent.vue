@@ -18,36 +18,26 @@
               <el-input v-model="temp.title" />
             </el-col>
           </el-form-item>
-          <el-form-item label="加班类型" prop="type">
-            <el-select v-model="temp.type" placeholder="请选择加班类型" default-first-option>
-              <el-option label="平日" value="0" />
-              <el-option label="周末" value="1" />
-              <el-option label="节假日" value="2" />
-              <el-option label="其他" value="3" />
+          <el-form-item label="类型" prop="type">
+            <el-select v-model="temp.type" placeholder="请选择休假种类">
+              <el-option label="直行" value="0" />
+              <el-option label="直归" value="1" />
+              <el-option label="直行直归" value="2" />
             </el-select>
           </el-form-item>
 
-          <el-form-item label="加班日期" prop="otDate">
+          <el-form-item label="日期" prop="absentDate">
             <el-date-picker
-              v-model="temp.otDate"
-              start-placeholder="开始时间"
-              end-placeholder="结束时间"
-              type="datetimerange"
-              :picker-options="pickerOptions"
-              :default-time="['18:00:00', '20:00:00']"
+              v-model="temp.absentDate"
+              placeholder="选择日期"
+              type="date"
               clearable
-              @change="dateChange"
             />
           </el-form-item>
 
-          <el-form-item label="加班小时数" prop="title">
-            <el-col :span="4">
-              <el-input-number :min="0" v-model="temp.hours" />
-            </el-col>
-          </el-form-item>
-          <el-form-item label="事由" prop="reason">
+          <el-form-item label="备注" prop="reason">
             <el-col :span="11">
-              <el-input type="textarea" v-model="temp.reason" placeholder="请输入加班事由" />
+              <el-input type="textarea" v-model="temp.reason" placeholder="请输入备注" />
             </el-col>
           </el-form-item>
           <el-form-item>
@@ -71,7 +61,7 @@
             <el-button icon="el-icon-user-solid" @click="handleSelectEmp('manager')">选择部门</el-button>
           </el-form-item>
 
-          <el-form-item label="人事部审批" prop="hrName">
+          <el-form-item label="人事部审批"  prop="hrName">
             <el-select v-model="temp.hrName" placeholder="选择人事部员工" value-key="item" @change="hrChange">
               <el-option
                 v-for="(item,idx) in hrOptions"
@@ -83,20 +73,8 @@
             <el-button icon="el-icon-user-solid" @click="handleSelectEmp('hr')">选择部门</el-button>
           </el-form-item>
 
-          <el-form-item label="总经理审批" v-show="temp.hours>=24">
-            <el-select v-model="temp.ceoName" placeholder="选择总经理" value-key="item" @change="ceoChange">
-              <el-option
-                v-for="(item,idx) in ceoOptions"
-                :key="idx"
-                :label="item.empName"
-                :value="item">
-              </el-option>
-            </el-select>
-            <el-button icon="el-icon-user-solid" @click="handleSelectEmp('ceo')">选择部门</el-button>
-          </el-form-item>
-
           <el-form-item>
-            <el-button type="primary" @click="submit">保存加班申请</el-button>
+            <el-button type="primary" @click="submit">保存申请</el-button>
             <el-button @click="active=0">返回</el-button>
           </el-form-item>
       </div>
@@ -137,40 +115,35 @@
         </div>
       </div>
 
-    </div>
+    <div>
   </div>
 </template>
 
 <script>
-import { submit } from '@/api/activiti/process/ot'
+import { submit } from '@/api/activiti/process/absent'
 import { fetchList as fetchDeptList } from '@/api/dept'
 import { fetchsubDeptEmp } from '@/api/emp'
 import { fecthSpecialemp } from '@/api/activiti/specialemp'
 
 export default {
-  name: "OT",
+  name: "Absent",
   data() {
     return {
       active: 0,
-      permitSubmit: false,
       temp: {
-        title: '○月○日加班申請',
-        type: 0,
-        otDate: undefined,
-        hours: undefined,
+        title: '○月○日直行直归申請',
+        type: undefined,
+        absentDate: undefined,
         reason: undefined,
         managerId: undefined,
         managerName: undefined,
         hrId: undefined,
-        hrName: undefined,
-        ceoId: undefined,
-        ceoName: undefined
+        hrName: undefined
       },
       rules: {
-        title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
-        type: [{ required: true, message: '加班类型不能为空', trigger: 'blur' }],
-        otDate: [{ required: true, message: '加班日期时间不能为空', trigger: 'blur' }],
-        hours: [{ required: true, message: '加班小时数不能为空', trigger: 'blur' }]
+        title: [{ required: true, message: '标题不能为空', trigger: 'change' }],
+        type: [{ required: true, message: '请假类型不能为空', trigger: 'blur' }],
+        absentDate: [{ required: true, message: '请假天数不能为空', trigger: 'blur' }],
       },
       leaderRules: {
         managerName: [{ required: true, message: '主管不能为空', trigger: 'blur' }],
@@ -179,7 +152,6 @@ export default {
       whoApprove: '',
       managerOptions: [],
       hrOptions: [],
-      ceoOptions: [],
       tagOptions: [],
       showEmp: false,
       deptId: undefined,
@@ -188,39 +160,24 @@ export default {
         children: 'children',
         label: 'deptName'
       },
-    }
+      
+    };
   },
   created() {
     this.fecthSpecialemp()
-    this.temp.type = this.temp.type.toString()
   },
   methods: {
     resetTemp() {
       this.temp = {
-        title: '○月○日加班申請',
+        title: '○月○日直行直归申請',
         type: undefined,
-        otDate: undefined,
-        hours: undefined,
+        absentDate: undefined,
         reason: undefined,
         managerId: undefined,
         managerName: undefined,
         hrId: undefined,
-        hrName: undefined,
-        ceoId: undefined,
-        ceoName: undefined
-      },
-      this.active = 0
-      this.permitSubmit = false
-    },
-    fecthSpecialemp(){
-      fecthSpecialemp('hr').then(res =>{
-        this.temp.hrId = res.data.empId
-        this.temp.hrName = res.data.empName
-      })
-      fecthSpecialemp('ceo').then(res =>{
-        this.temp.ceoId = res.data.empId
-        this.temp.ceoName = res.data.empName
-      })
+        hrName: undefined
+      }
     },
     checkStep1(){
       this.permitSubmit = false
@@ -255,10 +212,6 @@ export default {
         }
       })
     },
-    dateChange(val){ //自动计算请假天数
-      let diftime = (val[1]-val[0])/1000/60/60
-      this.temp.hours =  diftime
-    },
     fetchDeptList(){
       fetchDeptList().then(res =>{
         this.deptList = res.data
@@ -278,8 +231,6 @@ export default {
           this.managerOptions = res.data
         }else if(this.whoApprove=='hr'){
           this.hrOptions = res.data
-        }else if(this.whoApprove=='ceo'){
-          this.ceoOptions = res.data
         }
       })
     },
@@ -291,9 +242,6 @@ export default {
       }else if(this.whoApprove=='hr'){
         this.temp.hrId = empId
         this.temp.hrName = empName
-      }else if(this.whoApprove=='ceo'){
-        this.temp.ceoId = empId
-        this.temp.ceoName = empName
       }
       this.showEmp = false
     },
@@ -307,24 +255,17 @@ export default {
       this.temp.hrName = val.empName
       this.showEmp = false
     },
-    ceoChange(val){
-      this.temp.ceoId = val.id
-      this.temp.ceoName = val.empName
-      this.showEmp = false
+    fecthSpecialemp(){
+      fecthSpecialemp('hr').then(res =>{
+        this.temp.hrId = res.data.empId
+        this.temp.hrName = res.data.empName
+      })
     }
   }
 }
 </script>
 
 <style>
-  .marginTop {
-    margin-top: 10px;
-  }
-
-  .marginLeft {
-    margin-left: 10px;
-  }
-
   .custom-tree-node {
     flex: 1;
     display: flex;
@@ -339,5 +280,13 @@ export default {
     &:last-child {
       margin-bottom: 0;
     }
+  }
+
+  .marginLeft {
+    margin-left: 10px;
+  }
+
+  .marginTop {
+    margin-top: 10px;
   }
 </style>
