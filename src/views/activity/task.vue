@@ -65,11 +65,11 @@
 
     <!-- 请假单 编辑框 -->
     <el-dialog :title="请假单" :visible.sync="leaveFormVisible" >
-      <el-form ref="dataForm" :model="leaveTemp" label-position="left" label-width="100px">
-        <el-form-item label="taskId" hidden >
+      <el-form ref="dataForm" :model="leaveTemp" label-position="left" label-width="80px">
+        <el-form-item label="taskId" hidden>
           <el-input v-model="leaveTemp.taskId" disabled />
         </el-form-item>
-        <el-form-item label="ID" hidden >
+        <el-form-item label="ID" hidden>
           <el-input v-model="leaveTemp.id" disabled />
         </el-form-item>
         
@@ -167,7 +167,7 @@
 
     <!-- 加班单 编辑框 -->
     <el-dialog :title="加班单" :visible.sync="OTFormVisible" >
-      <el-form ref="dataForm" :model="OTTemp" label-position="left" label-width="100px">
+      <el-form ref="dataForm" :model="OTTemp" label-position="left" label-width="80px">
         <el-form-item label="ID" hidden >
           <el-input v-model="OTTemp.id" disabled />
         </el-form-item>
@@ -265,7 +265,7 @@
     
     <!-- 直行直归单 编辑框 -->
     <el-dialog :title="直行直归单" :visible.sync="absentFormVisible" >
-      <el-form ref="dataForm" :model="absentTemp" label-position="left" label-width="100px">
+      <el-form ref="dataForm" :model="absentTemp" label-position="left" label-width="80px">
         <el-form-item label="taskId" hidden >
           <el-input v-model="absentTemp.taskId" disabled />
         </el-form-item>
@@ -343,7 +343,7 @@
 
     <!-- 迟到早退单 编辑框 -->
     <el-dialog :title="迟到早退" :visible.sync="lateFormVisible" >
-      <el-form ref="dataForm" :model="lateTemp" label-position="left" label-width="100px">
+      <el-form ref="dataForm" :model="lateTemp" label-position="left" label-width="80px">
         <el-form-item label="taskId" hidden >
           <el-input v-model="lateTemp.taskId" disabled />
         </el-form-item>
@@ -418,17 +418,133 @@
       </div>
     </el-dialog>
 
+    <!-- 交通报销单 编辑框 -->
+    <el-dialog :title="交通报销单" :visible.sync="trafficFormVisible" fullscreen>
+      <el-form ref="dataForm" :model="trafficTemp" label-position="left" label-width="80px">
+        <el-form-item label="taskId" hidden>
+          <el-input v-model="trafficTemp.taskId" disabled />
+        </el-form-item>
+        <el-form-item label="ID" hidden>
+          <el-input v-model="trafficTemp.id" disabled />
+        </el-form-item>
+
+        <el-row :gutter="20">
+          <el-col :span="5">
+            <el-form-item label="标题" label-width="40px">
+              <el-input v-model="trafficTemp.title" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="备注" label-width="40px">
+              <el-input v-model="trafficTemp.remark" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="月份" label-width="40px">
+              <el-date-picker v-model="trafficTemp.month" type="month" disabled ></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="报销金额" label-width="80px">
+              <el-input v-model="trafficTemp.amount" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 滚动条 -->
+        <el-form-item label="交通费" size="medium">
+            <div class="infinite-list" v-infinite-scroll="load" style="overflow:auto">
+              <el-row v-for="i in feeTemp.trafficList.length" class="infinite-list-item" :model="feeTemp.trafficList" :gutter="5" >
+                <el-col :span="0.5" >
+                  <span>{{i}}<span>
+                </el-col>
+                <el-col :span="4" >
+                  <el-date-picker v-model="feeTemp.trafficList[i-1].feeDate" placeholder="选择日期" type="date" disabled/>
+                </el-col>
+                <el-col :span="4" >
+                  <el-input v-model="feeTemp.trafficList[i-1].from" placeholder="出发地" disabled ></el-input>
+                </el-col>
+                <el-col :span="4" >
+                  <el-input v-model="feeTemp.trafficList[i-1].to" placeholder="目的地" disabled ></el-input>
+                </el-col>
+                <el-col :span="4" >
+                  <el-input v-model="feeTemp.trafficList[i-1].reason" placeholder="原因" disabled></el-input>
+                </el-col>
+                <el-col :span="3" >
+                  <el-select v-model="feeTemp.trafficList[i-1].type" placeholder="费用类型" disabled>
+                    <el-option label="全部" value="0" />
+                    <el-option label="车费" value="1" />
+                    <el-option label="高速费" value="2" />
+                    <el-option label="停车费" value="3" />
+                    <el-option label="其他" value="4" />
+                  </el-select>
+                </el-col>
+                <el-col :span="3" class="marginLeft">
+                  <el-input v-model="feeTemp.trafficList[i-1].fee" disabled></el-input>
+                </el-col>
+              </el-row>
+            </div>
+        </el-form-item>
+
+        <el-form-item label="批注信息" label-width="80px">
+          <el-table
+            :data="commentData"
+            style="width: 100%"
+            fit
+            border
+            highlight-current-row
+          >
+            <el-table-column label="日期" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.createTime | formatDate }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="审批人" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.empName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="批语">
+              <template slot-scope="{row}">
+                <span>{{ row.comment }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+
+        <el-form-item label="批注" >
+          <el-input v-model="trafficTemp.comment" />
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <div v-if="selfRequest">
+          <el-button type="primary" @click="approveRequest(trafficTemp,'button','traffic')">提交</el-button>
+          <el-button type="warning" @click="rejectRequest(trafficTemp,'button','traffic')">放弃</el-button>
+          <el-button @click="trafficFormVisible = false">取消</el-button>
+        </div>
+        <div v-else>
+          <el-button type="primary" @click="approveRequest(trafficTemp,'button','traffic')">批准</el-button>
+          <el-button type="warning" @click="returnRequest(trafficTemp,'button','traffic')">退回</el-button>
+          <el-button type="danger" @click="rejectRequest(trafficTemp,'button','traffic')">拒绝</el-button>
+          <el-button @click="trafficFormVisible = false">取消</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import { fetchList } from '@/api/activiti/task'
 import { getComment } from '@/api/activiti/comment'
+import { formatDate, formatAssignee, parseTime } from '@/utils'
 import { showLeaveInfo,approveLeaveRequest, returnLeaveRequest, rejectLeaveRequest } from '@/api/activiti/process/leave'
 import { showOTInfo,approveOTRequest, returnOTRequest, rejectOTRequest } from '@/api/activiti/process/ot'
 import { showAbsentInfo,approveAbsentRequest, returnAbsentRequest, rejectAbsentRequest } from '@/api/activiti/process/absent'
 import { showLateInfo,approveLateRequest, returnLateRequest, rejectLateRequest } from '@/api/activiti/process/late'
-import { formatDate, formatAssignee, parseTime } from '@/utils'
+import { showTrafficInfo,approveTrafficRequest, returnTrafficRequest, rejectTrafficRequest } from '@/api/activiti/process/traffic'
+import { showTrafficfeeInfo } from '@/api/activiti/process/trafficfee'
 
 export default {
   name: 'ActivitiTask',
@@ -453,6 +569,7 @@ export default {
       OTFormVisible: false,
       absentFormVisible: false,
       lateFormVisible: false,
+      trafficFormVisible: false,
       dialogStatus: '',
       leaveTemp: {
         id: undefined,
@@ -498,6 +615,19 @@ export default {
         reason: undefined,
         comment: undefined
       },
+      trafficTemp: {
+        id: undefined,
+        taskId: undefined,
+        processInstanceId: undefined,
+        title: undefined,
+        month: undefined,
+        remark: undefined,
+        empName: undefined,
+        comment: undefined
+      },
+      feeTemp: {
+        trafficList: []
+      },
       selfRequest: false,
       commentTemp: {
         taskId: undefined,
@@ -523,6 +653,7 @@ export default {
       this.OTFormVisible = false
       this.absentFormVisible = false
       this.lateFormVisible = false,
+      this.trafficFormVisible = false,
       this.selfRequest = false
       this.commentTemp = {
         taskId: undefined,
@@ -571,6 +702,20 @@ export default {
           this.selfRequest = row.selfRequest
           this.commentTemp.key = 'lateProcess'
           this.lateFormVisible = true
+        })
+      }else if(key=='trafficProcess'){
+        showTrafficInfo(id).then( res => {
+          this.trafficTemp = Object.assign({}, res.data) // copy obj
+          this.trafficTemp.taskId = row.id
+          this.selfRequest = row.selfRequest
+          this.commentTemp.key = 'trafficProcess'
+          this.trafficFormVisible = true
+        })
+        showTrafficfeeInfo(id).then( res =>{
+          this.feeTemp.trafficList = res.data
+          this.feeTemp.trafficList.forEach( item =>{
+            item.type = item.type.toString()
+          })
         })
       }
     },
@@ -625,6 +770,15 @@ export default {
           })
         })
         this.resetStatus()
+      }else if(key=='trafficProcess'){
+        approveTrafficRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
       }
     },
     returnRequest(row, tag) {
@@ -659,6 +813,15 @@ export default {
         this.resetStatus()
       }else if(key=='lateProcess'){
         returnLateRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
+      }else if(key=='trafficProcess'){
+        returnTrafficRequest(this.commentTemp).then(() =>{
           this.getList()
           this.$message({
             type: 'success',
@@ -707,6 +870,15 @@ export default {
           })
         })
         this.resetStatus()
+      }else if(key=='trafficProcess'){
+        rejectTrafficRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
       }
     }
   }
@@ -714,5 +886,7 @@ export default {
 </script>
 
 <style>
-
+  .el-row {
+    margin-bottom: 10px;
+  }
 </style>

@@ -213,6 +213,49 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
+
+      <!-- 交通费报销 Tab -->
+      <el-tab-pane label="交通费报销" name="traffic">
+        <el-table
+          :key="trafficTableKey"
+          v-loading="listLoading"
+          :data="trafficList"
+          border
+          fit
+          highlight-current-row
+          style="width: 100%;"
+          @cell-click="trafficCellClick"
+        >
+          <el-table-column label="序号" sortable align="center" width="80">
+            <template slot-scope="{row, $index}">
+              <span>{{ $index + 1 }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="标题" align="left" >
+            <template slot-scope="{row}">
+              <span>{{ row.title }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="报销金额" align="center" >
+            <template slot-scope="{row}">
+              <span>{{ row.amount }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="申请日期"  align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.createTime | formatDate }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" sortable class-name="status-col" >
+            <template slot-scope="{row}">
+              <el-tag effect="dark" :type="row.status | statusColor">
+                {{ row.status | statusFilter }}
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+
     </el-tabs>
 
     <!-- 分页 -->
@@ -482,17 +525,111 @@
       </div>
     </el-dialog>
 
+    <!-- 交通费报销 回显-->
+    <el-dialog :title="交通费报销" :visible.sync="trafficFormVisible" fullscreen>
+      <el-form ref="dataForm" :model="trafficTemp" label-position="left" label-width="80px">
+        <el-row :gutter="20">
+          <el-col :span="5">
+            <el-form-item label="标题" label-width="40px">
+              <el-input v-model="trafficTemp.title" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="备注" label-width="40px">
+              <el-input v-model="trafficTemp.remark" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="月份" label-width="40px">
+              <el-date-picker v-model="trafficTemp.month" type="month" disabled ></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="报销金额" label-width="80px">
+              <el-input v-model="trafficTemp.amount" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 滚动条 -->
+        <el-form-item label="交通费" size="medium">
+            <div class="infinite-list" v-infinite-scroll="load" style="overflow:auto">
+              <el-row v-for="i in feeTemp.trafficList.length" class="infinite-list-item" :model="feeTemp.trafficList" :gutter="5" >
+                <el-col :span="0.5" >
+                  <span>{{i}}<span>
+                </el-col>
+                <el-col :span="4" >
+                  <el-date-picker v-model="feeTemp.trafficList[i-1].feeDate" placeholder="选择日期" type="date" disabled/>
+                </el-col>
+                <el-col :span="4" >
+                  <el-input v-model="feeTemp.trafficList[i-1].from" placeholder="出发地" disabled ></el-input>
+                </el-col>
+                <el-col :span="4" >
+                  <el-input v-model="feeTemp.trafficList[i-1].to" placeholder="目的地" disabled ></el-input>
+                </el-col>
+                <el-col :span="4" >
+                  <el-input v-model="feeTemp.trafficList[i-1].reason" placeholder="原因" disabled></el-input>
+                </el-col>
+                <el-col :span="3" >
+                  <el-select v-model="feeTemp.trafficList[i-1].type" placeholder="费用类型" disabled>
+                    <el-option label="全部" value="0" />
+                    <el-option label="车费" value="1" />
+                    <el-option label="高速费" value="2" />
+                    <el-option label="停车费" value="3" />
+                    <el-option label="其他" value="4" />
+                  </el-select>
+                </el-col>
+                <el-col :span="3" class="marginLeft">
+                  <el-input v-model="feeTemp.trafficList[i-1].fee" disabled></el-input>
+                </el-col>
+              </el-row>
+            </div>
+        </el-form-item>
+
+        <el-form-item label="批注信息" label-width="80px">
+          <el-table
+            :data="commentData"
+            style="width: 100%"
+            fit
+            border
+            highlight-current-row
+          >
+            <el-table-column label="日期" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.createTime | formatDate }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="审批人" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.empName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="批语">
+              <template slot-scope="{row}">
+                <span>{{ row.comment }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="trafficFormVisible = false">取消</el-button>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
+import { getComment } from '@/api/activiti/comment'
+import { formatDate } from '@/utils'
+import Pagination from '@/components/Pagination'
 import { fetchLeaveHistory, showLeaveInfo } from '@/api/activiti/process/leave'
 import { fetchOTHistory, showOTInfo } from '@/api/activiti/process/ot'
 import { fetchAbsentHistory, showAbsentInfo } from '@/api/activiti/process/absent'
 import { fetchLateHistory, showLateInfo } from '@/api/activiti/process/late'
-import { getComment } from '@/api/activiti/comment'
-import { formatDate } from '@/utils'
-import Pagination from '@/components/Pagination'
+import { fetchTrafficHistory, showTrafficInfo } from '@/api/activiti/process/traffic'
+import { showTrafficfeeInfo } from '@/api/activiti/process/trafficfee'
+
 
 export default {
   name: 'History',
@@ -554,15 +691,18 @@ export default {
       OTTableKey: 1,
       absentTableKey: 2,
       lateTableKey: 3,
+      trafficTableKey: 4,
       listLoading: true,
       leaveList: [],
       OTList: [],
       absentList: [],
       lateList: [],
+      trafficList: [],
       leaveFormVisible: false,
       otFormVisible: false,
       absentFormVisible: false,
       lateFormVisible: false,
+      trafficFormVisible: false,
       leaveTemp: {
         id: undefined,
         taskId: undefined,
@@ -604,6 +744,18 @@ export default {
         reason: undefined,
         comment: undefined
       },
+      trafficTemp: {
+        id: undefined,
+        taskId: undefined,
+        processInstanceId: undefined,
+        title: undefined,
+        month: undefined,
+        remark: undefined,
+        empName: undefined,
+      },
+      feeTemp: {
+        trafficList: []
+      },
       commentTemp: {
         taskId: undefined,
         comment: undefined,
@@ -639,6 +791,12 @@ export default {
       }else if(this.activeTask=='late'){
         fetchLateHistory(this.listQuery).then(response => {
           this.lateList = response.data.records
+          this.total = response.data.total
+          this.listLoading = false
+        })
+      }else if(this.activeTask=='traffic'){
+        fetchTrafficHistory(this.listQuery).then(response => {
+          this.trafficList = response.data.records
           this.total = response.data.total
           this.listLoading = false
         })
@@ -687,11 +845,28 @@ export default {
         this.lateTemp.type = this.lateTemp.type.toString()
         this.lateFormVisible = true
       })
+    },
+    trafficCellClick(row){
+      getComment(row.instanceId).then( res => {
+        this.commentData = res.data
+      })
+      showTrafficInfo(row.id).then( res => {
+        this.trafficTemp = Object.assign({}, res.data) // copy obj
+        this.trafficFormVisible = true
+      })
+      showTrafficfeeInfo(row.id).then( res =>{
+        this.feeTemp.trafficList = res.data
+        this.feeTemp.trafficList.forEach( item =>{
+          item.type = item.type.toString()
+        })
+      })
     }
   }
 }
 </script>
 
 <style>
-
+  .el-row {
+    margin-bottom: 10px;
+  }
 </style>

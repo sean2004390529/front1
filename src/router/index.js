@@ -254,6 +254,12 @@ export const asyncRoutes = [
             name: '迟到早退',
             component: () => import('@/views/activity/process/late'),
             meta: { title: '迟到早退', icon: 'bug' }
+          },
+          {
+            path: '/activity/process/traffic',
+            name: '交通费报销',
+            component: () => import('@/views/activity/process/traffic'),
+            meta: { title: '交通费报销', icon: 'bug' }
           }
         ]
       },
