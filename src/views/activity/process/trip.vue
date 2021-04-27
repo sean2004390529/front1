@@ -12,89 +12,106 @@
     <div class="marginTop">
       <!-- 填写申请 step0 -->
       <div v-show="active==0">
-        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" >
-          <el-row :gutter="20">
-            <el-col :span="11">
+        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" >
+           <el-row :gutter="20">
+            <el-col :span="5">
               <el-form-item label="标题" prop="title">
                   <el-input v-model="temp.title" />
               </el-form-item>
             </el-col>
-            <el-col :span="11">
-              <el-form-item label="报销月份" prop="month">
+            <el-col :span="5">
+              <el-form-item label="目的地" prop="destination">
+                  <el-input v-model="temp.destination" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <el-form-item label="出差日期" prop="tripDate">
                 <el-date-picker
-                  v-model="temp.month"
-                  placeholder="选择月份"
-                  type="month"
+                  v-model="temp.tripDate"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  type="datetimerange"
+                  :picker-options="pickerOptions"
+                  :default-time="['09:00:00', '18:00:00']"
                   clearable
+                  @change="dateChange"
                 />
+              </el-form-item>
+            </el-col>
+            <el-col :span="3">
+              <el-form-item label="出差天数" prop="days">
+                  <el-input v-model="temp.days" />
               </el-form-item>
             </el-col>
           </el-row>
 
           <!-- 滚动条 -->
-          <el-form-item label="交通费" >
+          <el-form-item label="详细费用" >
             <el-row :gutter="20">
               <el-col :span="0.5">
               </el-col>
-              <el-col :span="4">
+              <el-col :span="3">
                 <el-divider direction="vertical"></el-divider>
                 <span>日期</span>
               </el-col>
-              <el-col :span="4">
+              <el-col :span="3">
                 <el-divider direction="vertical"></el-divider>
-                <span>出发地</span>
-              </el-col>
-              <el-col :span="4">
-                <el-divider direction="vertical"></el-divider>
-                <span>目的地</span>
-              </el-col>
-              <el-col :span="4">
-                <el-divider direction="vertical"></el-divider>
-                <span>原因</span>
+                <span>地点/酒店</span>
               </el-col>
               <el-col :span="3">
                 <el-divider direction="vertical"></el-divider>
-                <span>费用类型</span>
+                <span>酒店费用</span>
+              </el-col>
+              <el-col :span="3">
+                <el-divider direction="vertical"></el-divider>
+                <span>飞机高铁费用</span>
+              </el-col>
+              <el-col :span="3">
+                <el-divider direction="vertical"></el-divider>
+                <span>的士交通费用</span>
+              </el-col>
+              <el-col :span="3">
+                <el-divider direction="vertical"></el-divider>
+                <span>补贴</span>
+              </el-col>
+              <el-col :span="3">
+                <el-divider direction="vertical"></el-divider>
+                <span>其他费用</span>
               </el-col>
             </el-row>
 
-            <el-row :key="i" v-for="i in feeTemp.trafficList.length" class="infinite-list-item" :model="feeTemp.trafficList" :gutter="5" >
+            <el-row :key="i" v-for="i in feeTemp.tripList.length" class="infinite-list-item" :model="feeTemp.tripList" :gutter="5" >
               <el-col :span="0.5" >
-                <span>{{i}}<span>
+                <span>{{i}}</span>
               </el-col>
-              <el-col :span="4" >
-                <el-date-picker v-model="feeTemp.trafficList[i-1].feeDate" placeholder="选择日期" type="date" clearable />
+              <el-col :span="4">
+                <el-date-picker v-model="feeTemp.tripList[i-1].tripDate" placeholder="选择日期" type="date" clearable />
               </el-col>
-              <el-col :span="4" >
-                <el-input v-model="feeTemp.trafficList[i-1].from" placeholder="出发地"></el-input>
-              </el-col>
-              <el-col :span="4" >
-                <el-input v-model="feeTemp.trafficList[i-1].to" placeholder="目的地"></el-input>
-              </el-col>
-              <el-col :span="4" >
-                <el-input v-model="feeTemp.trafficList[i-1].reason" placeholder="原因"></el-input>
+              <el-col :span="4">
+                <el-input v-model="feeTemp.tripList[i-1].destination" placeholder="住宿地/酒店"></el-input>
               </el-col>
               <el-col :span="3" >
-                <el-select v-model="feeTemp.trafficList[i-1].type" placeholder="费用类型">
-                  <el-option label="全部" value="0" />
-                  <el-option label="车费" value="1" />
-                  <el-option label="高速费" value="2" />
-                  <el-option label="停车费" value="3" />
-                  <el-option label="其他" value="4" />
-                </el-select>
+                <el-input-number v-model="feeTemp.tripList[i-1].hotelFee" placeholder="酒店费用" @blur="caculatePreAmount"></el-input-number>
+              </el-col> 
+              <el-col :span="3" >
+                <el-input-number v-model="feeTemp.tripList[i-1].airportFee" placeholder="飞机高铁费用" @blur="caculatePreAmount"></el-input-number>
               </el-col>
-              <el-col :span="3" class="marginLeft">
-                <el-input-number v-model="feeTemp.trafficList[i-1].fee" placeholder="金额" 
-                  @focus="addItem(i)" 
-                  @blur="caculatePreAmount">
-                </el-input-number>
+              <el-col :span="3" >
+                <el-input-number v-model="feeTemp.tripList[i-1].taxiFee" placeholder="的士交通费用" @blur="caculatePreAmount"></el-input-number>
+              </el-col>
+              <el-col :span="3" >
+                <el-input-number v-model="feeTemp.tripList[i-1].allowance" placeholder="补贴" @blur="caculatePreAmount"></el-input-number>
+              </el-col>
+              <el-col :span="3" >
+                <el-input-number v-model="feeTemp.tripList[i-1].otherFee" placeholder="其他费用" @blur="caculatePreAmount"></el-input-number>
               </el-col>
             </el-row>
+            <el-button icon="el-icon-plus" circle class="marginBottom" @click="addItem"></el-button>
           </el-form-item>
 
-          <el-form-item label="备注" prop="remark">
+          <el-form-item label="出差目的" prop="remark">
             <el-col :span="11">
-              <el-input type="textarea" v-model="temp.remark" placeholder="备注" />
+              <el-input type="textarea" v-model="temp.reason" placeholder="出差目的" />
             </el-col>
           </el-form-item>
 
@@ -160,6 +177,7 @@
               <el-input-number v-model="feeTemp.preAmount" disabled />
             </el-col>
           </el-form-item>
+        </el-form>
       </div>
 
       <!-- 部门树 step1-->
@@ -198,27 +216,27 @@
         </div>
       </div>
 
-
-    <div>
+    </div>
   </div>
 </template>
 
 <script>
-import { submit } from '@/api/activiti/process/traffic'
-import { batchSaveTempFee } from '@/api/activiti/process/trafficfee'
+import { submit } from '@/api/activiti/process/trip'
+import { batchSaveTempFee } from '@/api/activiti/process/tripfee'
 import { fetchList as fetchDeptList } from '@/api/dept'
 import { fetchsubDeptEmp } from '@/api/emp'
 import { fecthSpecialemp } from '@/api/activiti/specialemp'
 
 export default {
-  name: "Traffic",
+  name: "Trip",
   data() {
     return {
       active: 0,
       temp: {
-        title: '○月交通费',
-        month: undefined,
-        remark: undefined,
+        title: '出差报销',
+        destination: undefined,
+        tripDate: undefined,
+        days: undefined,
         managerId: undefined,
         managerName: undefined,
         financeId: undefined,
@@ -229,7 +247,10 @@ export default {
         amount: undefined
       },
       rules: {
-        title: [{ required: true, message: '标题不能为空', trigger: 'change' }],
+        title: [{ required: true, message: '不能为空', trigger: 'change' }],
+        destination: [{ required: true, message: '不能为空', trigger: 'change' }],
+        tripDate: [{ required: true, message: '不能为空', trigger: 'change' }],
+        days: [{ required: true, message: '不能为空', trigger: 'change' }],
       },
       leaderRules: {
         managerName: [{ required: true, message: '主管不能为空', trigger: 'blur' }],
@@ -251,23 +272,22 @@ export default {
       feeTemp: {
         count: 1,
         preAmount: 0,
-        trafficList: [
-          {feeDate: undefined, from: undefined, to: undefined, reason: undefined, type: 0, fee: undefined}
+        tripList: [
+          {tripDate: undefined, destination: undefined, hotelFee: undefined, airportFee: undefined, taxiFee: undefined, allowance: undefined, otherFee: undefined }
         ]
       }
     }
   },
   created() {
     this.fecthSpecialemp()
-    this.temp.month = new Date()
-    this.feeTemp.trafficList[0].type = this.feeTemp.trafficList[0].type.toString()
   },
   methods: {
     resetTemp() {
       this.temp = {
-        title: '○月交通费',
-        month: undefined,
-        remark: undefined,
+        title: '出差报销',
+        destination: undefined,
+        tripDate: undefined,
+        days: undefined,
         managerId: undefined,
         managerName: undefined,
         financeId: undefined,
@@ -326,13 +346,22 @@ export default {
     },
     dateChange(val){ //自动计算请假天数
       let diftime = (val[1]-val[0])/1000/60/60
-      let day = 0
-      if(diftime<5){
-        day = 0.5
-      }else {
-        day = Math.floor(diftime/24) + 1
+      this.temp.days = Math.floor(diftime/24) + 1
+      this.addFeeItem()
+      this.feeTemp.tripList.forEach( (item,index) =>{
+        if(item.tripDate==null){
+          item.tripDate = new Date(val[0]).getTime() + index*86400000
+        }
+      })
+    },
+    addFeeItem(){
+      let putCount = this.temp.days - this.feeTemp.count
+      if(putCount > 0){
+        this.feeTemp.count = this.temp.days
+        for(let i=0; i<putCount; i++){
+          this.feeTemp.tripList.push({tripDate: undefined, destination: undefined, hotelFee: undefined, airportFee: undefined, taxiFee: undefined, allowance: undefined, otherFee: undefined })
+        }
       }
-      this.temp.leaveDays =  day
     },
     fetchDeptList(){
       fetchDeptList().then(res =>{
@@ -397,20 +426,31 @@ export default {
         this.temp.ceoName = res.data.empName
       })
     },
-    addItem(i){
-      if(i==this.feeTemp.count){
-        this.feeTemp.count += 1
-        this.feeTemp.trafficList.push({feeDate: undefined, from: undefined, to: undefined, reason: undefined, type: 0, fee: undefined})
-        this.feeTemp.trafficList[this.feeTemp.count-1].type = this.feeTemp.trafficList[this.feeTemp.count-1].type.toString()
-      }
+    addItem(){
+      this.feeTemp.count += 1
+      this.feeTemp.tripList.push({tripDate: undefined, destination: undefined, hotelFee: undefined, airportFee: undefined, taxiFee: undefined, allowance: undefined, otherFee: undefined })
     },
     caculatePreAmount() {
-      this.feeTemp.preAmount = 0,
-      this.feeTemp.trafficList.forEach( item => {
-        if(item.fee!=null){
-          this.feeTemp.preAmount = this.feeTemp.preAmount + item.fee
+      this.feeTemp.preAmount = 0
+      let preAmount = 0
+      this.feeTemp.tripList.forEach( item => {
+        if(item.hotelFee!=null){
+          preAmount += item.hotelFee
+        }
+        if(item.airportFee!=null){
+          preAmount += item.airportFee
+        }
+        if(item.taxiFee!=null){
+          preAmount += item.taxiFee
+        }
+        if(item.allowance!=null){
+          preAmount += item.allowance
+        }
+        if(item.otherFee!=null){
+          preAmount += item.otherFee
         }
       });
+      this.feeTemp.preAmount = preAmount
     }
   }
 }
@@ -439,6 +479,10 @@ export default {
 
   .marginTop {
     margin-top: 10px;
+  }
+
+  .marginBottom{
+    margin-bottom: 10px;
   }
 
   .infinite-list {

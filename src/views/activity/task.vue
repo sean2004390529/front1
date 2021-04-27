@@ -242,7 +242,6 @@
           </el-table>
         </el-form-item>
 
-
         <el-form-item label="批注" >
           <el-input v-model="OTTemp.comment" />
         </el-form-item>
@@ -453,37 +452,61 @@
 
         <!-- 滚动条 -->
         <el-form-item label="交通费" size="medium">
-            <div class="infinite-list" v-infinite-scroll="load" style="overflow:auto">
-              <el-row v-for="i in feeTemp.trafficList.length" class="infinite-list-item" :model="feeTemp.trafficList" :gutter="5" >
-                <el-col :span="0.5" >
-                  <span>{{i}}<span>
-                </el-col>
-                <el-col :span="4" >
-                  <el-date-picker v-model="feeTemp.trafficList[i-1].feeDate" placeholder="选择日期" type="date" disabled/>
-                </el-col>
-                <el-col :span="4" >
-                  <el-input v-model="feeTemp.trafficList[i-1].from" placeholder="出发地" disabled ></el-input>
-                </el-col>
-                <el-col :span="4" >
-                  <el-input v-model="feeTemp.trafficList[i-1].to" placeholder="目的地" disabled ></el-input>
-                </el-col>
-                <el-col :span="4" >
-                  <el-input v-model="feeTemp.trafficList[i-1].reason" placeholder="原因" disabled></el-input>
-                </el-col>
-                <el-col :span="3" >
-                  <el-select v-model="feeTemp.trafficList[i-1].type" placeholder="费用类型" disabled>
-                    <el-option label="全部" value="0" />
-                    <el-option label="车费" value="1" />
-                    <el-option label="高速费" value="2" />
-                    <el-option label="停车费" value="3" />
-                    <el-option label="其他" value="4" />
-                  </el-select>
-                </el-col>
-                <el-col :span="3" class="marginLeft">
-                  <el-input v-model="feeTemp.trafficList[i-1].fee" disabled></el-input>
-                </el-col>
-              </el-row>
-            </div>
+          <!-- 分隔条 -->
+          <el-row :gutter="20">
+            <el-col :span="0.5">
+            </el-col>
+            <el-col :span="4">
+              <el-divider direction="vertical"></el-divider>
+              <span>日期</span>
+            </el-col>
+            <el-col :span="4">
+              <el-divider direction="vertical"></el-divider>
+              <span>出发地</span>
+            </el-col>
+            <el-col :span="4">
+              <el-divider direction="vertical"></el-divider>
+              <span>目的地</span>
+            </el-col>
+            <el-col :span="4">
+              <el-divider direction="vertical"></el-divider>
+              <span>原因</span>
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>费用类型</span>
+            </el-col>
+          </el-row>
+            
+          <el-row :key="i" v-for="i in trafficfeeTemp.trafficList.length" class="infinite-list-item" :model="trafficfeeTemp.trafficList" :gutter="5" >
+            <el-col :span="0.5" >
+              <span>{{i}}<span>
+            </el-col>
+            <el-col :span="4" >
+              <el-date-picker v-model="trafficfeeTemp.trafficList[i-1].feeDate" placeholder="选择日期" type="date" disabled/>
+            </el-col>
+            <el-col :span="4" >
+              <el-input v-model="trafficfeeTemp.trafficList[i-1].from" placeholder="出发地" disabled ></el-input>
+            </el-col>
+            <el-col :span="4" >
+              <el-input v-model="trafficfeeTemp.trafficList[i-1].to" placeholder="目的地" disabled ></el-input>
+            </el-col>
+            <el-col :span="4" >
+              <el-input v-model="trafficfeeTemp.trafficList[i-1].reason" placeholder="原因" disabled></el-input>
+            </el-col>
+            <el-col :span="3" >
+              <el-select v-model="trafficfeeTemp.trafficList[i-1].type" placeholder="费用类型" disabled>
+                <el-option label="全部" value="0" />
+                <el-option label="车费" value="1" />
+                <el-option label="高速费" value="2" />
+                <el-option label="停车费" value="3" />
+                <el-option label="其他" value="4" />
+              </el-select>
+            </el-col>
+            <el-col :span="3" class="marginLeft">
+              <el-input v-model="trafficfeeTemp.trafficList[i-1].fee" disabled></el-input>
+            </el-col>
+          </el-row>
         </el-form-item>
 
         <el-form-item label="批注信息" label-width="80px">
@@ -532,6 +555,167 @@
       </div>
     </el-dialog>
 
+    <!-- 出差报销单 编辑框 -->
+    <el-dialog :title="出差报销单" :visible.sync="tripFormVisible" fullscreen>
+      <el-form ref="dataForm" :model="tripTemp" label-position="left" label-width="70px">
+        <el-form-item label="taskId" hidden>
+          <el-input v-model="tripTemp.taskId" disabled />
+        </el-form-item>
+        <el-form-item label="ID" hidden>
+          <el-input v-model="tripTemp.id" disabled />
+        </el-form-item>
+
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="标题" >
+              <el-input v-model="tripTemp.title" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="目的地" >
+              <el-input v-model="tripTemp.destination" disabled />
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="7">
+            <el-form-item label="报销金额" >
+              <el-input v-model="tripTemp.amount" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="出差于">
+              <el-date-picker
+                v-model="tripTemp.startDate"
+                type="datetime" disabled >
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="结束于">
+              <el-date-picker
+                v-model="tripTemp.endDate"
+                type="datetime" disabled >
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item label="天数" >
+              <el-input v-model="tripTemp.days" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 滚动条 -->
+        <el-form-item label="交通费" size="medium">
+          <el-row :gutter="20">
+            <el-col :span="0.5">
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>日期</span>
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>地点/酒店</span>
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>酒店费用</span>
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>飞机高铁费用</span>
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>的士交通费用</span>
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>补贴</span>
+            </el-col>
+            <el-col :span="3">
+              <el-divider direction="vertical"></el-divider>
+              <span>其他费用</span>
+            </el-col>
+          </el-row>
+
+          <el-row :key="i" v-for="i in tripfeeTemp.tripList.length" class="infinite-list-item" :model="tripfeeTemp.tripList" :gutter="5" >
+            <el-col :span="0.5" >
+              <span>{{i}}<span>
+            </el-col>
+            <el-col :span="3" >
+              <el-date-picker v-model="tripfeeTemp.tripList[i-1].tripDate" type="date" disabled/>
+            </el-col>
+            <el-col :span="3" >
+              <el-input v-model="tripfeeTemp.tripList[i-1].destination" disabled ></el-input>
+            </el-col>
+            <el-col :span="3" >
+              <el-input v-model="tripfeeTemp.tripList[i-1].hotelFee" disabled ></el-input>
+            </el-col>
+            <el-col :span="3" >
+              <el-input v-model="tripfeeTemp.tripList[i-1].airportFee" disabled ></el-input>
+            </el-col>
+            <el-col :span="3" >
+              <el-input v-model="tripfeeTemp.tripList[i-1].taxiFee" disabled ></el-input>
+            </el-col>
+            <el-col :span="3" >
+              <el-input v-model="tripfeeTemp.tripList[i-1].allowance" disabled ></el-input>
+            </el-col>
+            <el-col :span="3" >
+              <el-input v-model="tripfeeTemp.tripList[i-1].otherFee" disabled ></el-input>
+            </el-col>
+          </el-row>
+        </el-form-item>
+
+        <el-form-item label="批注信息" label-width="80px">
+          <el-table
+            :data="commentData"
+            style="width: 100%"
+            fit
+            border
+            highlight-current-row
+          >
+            <el-table-column label="日期" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.createTime | formatDate }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="审批人" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.empName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="批语">
+              <template slot-scope="{row}">
+                <span>{{ row.comment }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+
+        <el-form-item label="批注" >
+          <el-input v-model="tripTemp.comment" />
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <div v-if="selfRequest">
+          <el-button type="primary" @click="approveRequest(tripTemp,'button','trip')">提交</el-button>
+          <el-button type="warning" @click="rejectRequest(tripTemp,'button','trip')">放弃</el-button>
+          <el-button @click="tripFormVisible = false">取消</el-button>
+        </div>
+        <div v-else>
+          <el-button type="primary" @click="approveRequest(tripTemp,'button','trip')">批准</el-button>
+          <el-button type="warning" @click="returnRequest(tripTemp,'button','trip')">退回</el-button>
+          <el-button type="danger" @click="rejectRequest(tripTemp,'button','trip')">拒绝</el-button>
+          <el-button @click="tripFormVisible = false">取消</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -545,6 +729,8 @@ import { showAbsentInfo,approveAbsentRequest, returnAbsentRequest, rejectAbsentR
 import { showLateInfo,approveLateRequest, returnLateRequest, rejectLateRequest } from '@/api/activiti/process/late'
 import { showTrafficInfo,approveTrafficRequest, returnTrafficRequest, rejectTrafficRequest } from '@/api/activiti/process/traffic'
 import { showTrafficfeeInfo } from '@/api/activiti/process/trafficfee'
+import { showTripInfo, approveTripRequest, returnTripRequest, rejectTripRequest } from '@/api/activiti/process/trip'
+import { showTripfeeInfo } from '@/api/activiti/process/tripfee'
 
 export default {
   name: 'ActivitiTask',
@@ -570,6 +756,7 @@ export default {
       absentFormVisible: false,
       lateFormVisible: false,
       trafficFormVisible: false,
+      tripFormVisible: false,
       dialogStatus: '',
       leaveTemp: {
         id: undefined,
@@ -625,8 +812,24 @@ export default {
         empName: undefined,
         comment: undefined
       },
-      feeTemp: {
+      tripTemp: {
+        id: undefined,
+        taskId: undefined,
+        processInstanceId: undefined,
+        title: undefined,
+        destination: undefined,
+        startDate: undefined,
+        endDate: undefined,
+        reason: undefined,
+        amount: undefined,
+        empName: undefined,
+        comment: undefined
+      },
+      trafficfeeTemp: {
         trafficList: []
+      },
+      tripfeeTemp: {
+        tripList: []
       },
       selfRequest: false,
       commentTemp: {
@@ -654,6 +857,7 @@ export default {
       this.absentFormVisible = false
       this.lateFormVisible = false,
       this.trafficFormVisible = false,
+      this.tripFormVisible = false,
       this.selfRequest = false
       this.commentTemp = {
         taskId: undefined,
@@ -712,10 +916,23 @@ export default {
           this.trafficFormVisible = true
         })
         showTrafficfeeInfo(id).then( res =>{
-          this.feeTemp.trafficList = res.data
-          this.feeTemp.trafficList.forEach( item =>{
+          this.trafficfeeTemp.trafficList = res.data
+          this.trafficfeeTemp.trafficList.forEach( item =>{
             item.type = item.type.toString()
           })
+        })
+      }else if(key=='tripProcess'){
+        showTripInfo(id).then( res => {
+          this.tripTemp = Object.assign({}, res.data) // copy obj
+          this.tripTemp.taskId = row.id
+          this.selfRequest = row.selfRequest
+          this.commentTemp.key = 'tripProcess'
+          this.tripFormVisible = true
+        })
+        showTripfeeInfo(id).then( res =>{
+          console.log("showTripfeeInfo", res)
+          this.tripfeeTemp.tripList = res.data
+          console.log("tripList", this.tripfeeTemp.tripList)
         })
       }
     },
@@ -779,6 +996,24 @@ export default {
           })
         })
         this.resetStatus()
+      }else if(key=='trafficProcess'){
+        approveTrafficRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
+      }else if(key=='tripProcess'){
+        approveTripRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
       }
     },
     returnRequest(row, tag) {
@@ -822,6 +1057,15 @@ export default {
         this.resetStatus()
       }else if(key=='trafficProcess'){
         returnTrafficRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
+      }else if(key=='tripProcess'){
+        returnTripRequest(this.commentTemp).then(() =>{
           this.getList()
           this.$message({
             type: 'success',
@@ -879,6 +1123,15 @@ export default {
           })
         })
         this.resetStatus()
+      }else if(key=='tripProcess'){
+        rejectTripRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
       }
     }
   }
@@ -889,4 +1142,5 @@ export default {
   .el-row {
     margin-bottom: 10px;
   }
+
 </style>
