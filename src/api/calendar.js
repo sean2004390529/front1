@@ -31,3 +31,26 @@ export function deleteEvent(data) {
   })
 }
 
+export function queryEmpCalendar(data) {
+  return request({
+    url: '/calendar/calendar/queryEmpCalendar',
+    method: 'post',
+    data
+  })
+}
+
+export function changeColor(data) {
+  return request({
+    url: `/calendar/calendar/changecolor`,
+    method: 'post',
+    data
+  })
+}
+
+export function updateFromPretrip(data) {
+  return request({
+    url: '/calendar/calendar/updateFromPretrip',
+    method: 'post',
+    data
+  })
+}

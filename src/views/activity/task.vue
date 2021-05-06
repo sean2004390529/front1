@@ -716,6 +716,112 @@
       </div>
     </el-dialog>
 
+    <!-- 出差预申请 编辑框 -->
+    <el-dialog :title="出差预申请" :visible.sync="pretripFormVisible" fullscreen>
+      <el-form ref="dataForm" :model="pretripTemp" label-position="left" label-width="80px">
+        <el-form-item label="taskId" hidden >
+          <el-input v-model="pretripTemp.taskId" disabled />
+        </el-form-item>
+        <el-form-item label="ID" hidden >
+          <el-input v-model="pretripTemp.id" disabled />
+        </el-form-item>
+        
+        <el-row :gutter="20">
+          <el-col :span="11">
+            <el-form-item label="标题" >
+              <el-input v-model="pretripTemp.title" disabled />
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="目的地">
+              <el-input v-model="pretripTemp.destination" disabled/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="11">
+            <el-form-item label="开始于">
+              <el-date-picker
+                v-model="pretripTemp.startDate"
+                type="date" disabled >
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="结束于">
+              <el-date-picker
+                v-model="pretripTemp.endDate"
+                type="date" disabled >
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item label="理由" >
+          <el-input v-model="pretripTemp.reason" type="textarea" :rows="4" disabled />
+        </el-form-item>
+        <el-form-item label="预定行程" >
+          <el-input v-model="pretripTemp.trip" type="textarea" :rows="4" disabled />
+        </el-form-item>
+        <el-form-item label="备注" >
+          <el-input v-model="pretripTemp.remark" type="textarea" :rows="4" disabled />
+        </el-form-item>
+        <el-form-item label="同行人" >
+          <el-tag>{{pretripTemp.emp1Name}}</el-tag>
+          <el-tag v-show="pretripTemp.emp2Name!=null">{{pretripTemp.emp2Name}}</el-tag>
+          <el-tag v-show="pretripTemp.emp3Name!=null">{{pretripTemp.emp3Name}}</el-tag>
+          <el-tag v-show="pretripTemp.emp4Name!=null">{{pretripTemp.emp4Name}}</el-tag>
+          <el-tag v-show="pretripTemp.emp5Name!=null">{{pretripTemp.emp5Name}}</el-tag>
+        </el-form-item>
+
+        <el-form-item label="批注信息">
+          <el-table
+            :data="commentData"
+            style="width: 100%"
+            fit
+            border
+            highlight-current-row
+          >
+            <el-table-column label="日期" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.createTime | formatDate }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="审批人" width="100px">
+              <template slot-scope="{row}">
+                <span>{{ row.empName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="批语">
+              <template slot-scope="{row}">
+                <span>{{ row.comment }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+
+
+        <el-form-item label="批注" >
+          <el-input v-model="pretripTemp.comment" />
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <div v-if="selfRequest">
+          <el-button type="primary" @click="approveRequest(pretripTemp,'button')">提交</el-button>
+          <el-button type="warning" @click="rejectRequest(pretripTemp,'button')">放弃</el-button>
+          <el-button @click="pretripFormVisible = false">取消</el-button>
+        </div>
+        <div v-else>
+          <el-button type="primary" @click="approveRequest(pretripTemp,'button')">批准</el-button>
+          <el-button type="warning" @click="returnRequest(pretripTemp,'button')">退回</el-button>
+          <el-button type="danger" @click="rejectRequest(pretripemp,'button')">拒绝</el-button>
+          <el-button @click="pretripFormVisible = false">取消</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -731,6 +837,7 @@ import { showTrafficInfo,approveTrafficRequest, returnTrafficRequest, rejectTraf
 import { showTrafficfeeInfo } from '@/api/activiti/process/trafficfee'
 import { showTripInfo, approveTripRequest, returnTripRequest, rejectTripRequest } from '@/api/activiti/process/trip'
 import { showTripfeeInfo } from '@/api/activiti/process/tripfee'
+import { showPretripInfo, approvePretripRequest, returnPretripRequest, rejectPretripRequest } from '@/api/activiti/process/pretrip'
 
 export default {
   name: 'ActivitiTask',
@@ -757,6 +864,7 @@ export default {
       lateFormVisible: false,
       trafficFormVisible: false,
       tripFormVisible: false,
+      pretripFormVisible: false,
       dialogStatus: '',
       leaveTemp: {
         id: undefined,
@@ -825,6 +933,19 @@ export default {
         empName: undefined,
         comment: undefined
       },
+      pretripTemp: {
+        id: undefined,
+        taskId: undefined,
+        processInstanceId: undefined,
+        title: undefined,
+        destination: undefined,
+        startDate: undefined,
+        endDate: undefined,
+        reason: undefined,
+        amount: undefined,
+        empName: undefined,
+        comment: undefined
+      },
       trafficfeeTemp: {
         trafficList: []
       },
@@ -858,6 +979,7 @@ export default {
       this.lateFormVisible = false,
       this.trafficFormVisible = false,
       this.tripFormVisible = false,
+      this.pretripFormVisible = false,
       this.selfRequest = false
       this.commentTemp = {
         taskId: undefined,
@@ -934,12 +1056,21 @@ export default {
           this.tripfeeTemp.tripList = res.data
           console.log("tripList", this.tripfeeTemp.tripList)
         })
+      }else if(key=='com1PretripProcess'){
+        showPretripInfo(id).then( res => {
+          this.pretripTemp = Object.assign({}, res.data) // copy obj
+          this.pretripTemp.taskId = row.id
+          this.selfRequest = row.selfRequest
+          this.commentTemp.key = 'com1PretripProcess'
+          this.pretripFormVisible = true
+        })
       }
     },
     handleCellClick(row){
       this.showInfo(row)
     },
     handleRequest(row, tag){
+      console.log("handleRequest", row, tag)
       if(tag=='button'){
         this.commentTemp.taskId = row.taskId
         this.commentTemp.comment = row.comment
@@ -1014,6 +1145,15 @@ export default {
           })
         })
         this.resetStatus()
+      }else if(key=='com1PretripProcess'){
+        approvePretripRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
       }
     },
     returnRequest(row, tag) {
@@ -1073,6 +1213,15 @@ export default {
           })
         })
         this.resetStatus()
+      }else if(key=='com1PretripProcess'){
+        returnPretripRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
       }
     },
     rejectRequest(row, tag, taskType){
@@ -1125,6 +1274,15 @@ export default {
         this.resetStatus()
       }else if(key=='tripProcess'){
         rejectTripRequest(this.commentTemp).then(() =>{
+          this.getList()
+          this.$message({
+            type: 'success',
+            message: '提交成功!'
+          })
+        })
+        this.resetStatus()
+      }else if(key=='com1PretripProcess'){
+        rejectPretripRequest(this.commentTemp).then(() =>{
           this.getList()
           this.$message({
             type: 'success',

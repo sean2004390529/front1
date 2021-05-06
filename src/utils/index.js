@@ -394,3 +394,35 @@ export function removeClass(ele, cls) {
 export function formatAssignee(name) {
   return name.split(":")[1]
 }
+
+/**
+ * rgb 颜色 与 hex 值互相转换
+ */
+
+export function rgbToHex(r, g, b) {
+  let hex = '#'
+  let rhex = Number(r).toString(16)
+  if(rhex.length==1){
+    rhex = "0"+ rhex
+  }
+  let ghex = Number(g).toString(16)
+  if(ghex.length==1){
+    ghex = "0"+ ghex
+  }
+  let bhex = Number(b).toString(16)
+  if(bhex.length==1){
+    bhex = "0"+ bhex
+  }
+  return hex+rhex+ghex+bhex
+}
+
+export function hexToRGB(hex){
+  // hex = "#F56C6C" --> 245,108,108
+  if(hex==null){
+    hex = "#000000"
+  }
+  let r = parseInt("0x" + hex.slice(1,3))
+  let g = parseInt("0x" + hex.slice(3,5))
+  let b = parseInt("0x" + hex.slice(5,7))
+  return {r,g,b}
+}

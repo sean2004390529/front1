@@ -868,17 +868,7 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <div v-if="selfRequest">
-          <el-button type="primary" @click="approveRequest(tripTemp,'button','trip')">提交</el-button>
-          <el-button type="warning" @click="rejectRequest(tripTemp,'button','trip')">放弃</el-button>
-          <el-button @click="tripFormVisible = false">取消</el-button>
-        </div>
-        <div v-else>
-          <el-button type="primary" @click="approveRequest(tripTemp,'button','trip')">批准</el-button>
-          <el-button type="warning" @click="returnRequest(tripTemp,'button','trip')">退回</el-button>
-          <el-button type="danger" @click="rejectRequest(tripTemp,'button','trip')">拒绝</el-button>
-          <el-button @click="tripFormVisible = false">取消</el-button>
-        </div>
+        <el-button @click="tripFormVisible = false">取消</el-button>
       </div>
     </el-dialog>
 

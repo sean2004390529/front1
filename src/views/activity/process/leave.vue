@@ -37,7 +37,6 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               type="datetimerange"
-              :picker-options="pickerOptions"
               :default-time="['09:00:00', '18:00:00']"
               clearable
               @change="dateChange"

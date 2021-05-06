@@ -206,19 +206,19 @@ export const asyncRoutes = [
         path: '/activity/activity',
         component: () => import('@/views/activity/deployment'),
         name: 'activity',
-        meta: { title: '流程部署', icon: 'form', roles: ['admin','activiti_admin'] }
+        meta: { title: '流程部署', icon: 'form', roles: ['admin','activitiAdmin'] }
       },
       {
         path: '/activity/instance',
         component: () => import('@/views/activity/instance'),
         name: '流程实例',
-        meta: { title: '流程实例', icon: 'form', roles: ['admin','activiti_admin'] }
+        meta: { title: '流程实例', icon: 'form', roles: ['admin','activitiAdmin'] }
       },
       {
         path: '/activity/specialemp',
         component: () => import('@/views/activity/specialemp'),
         name: '特殊员工',
-        meta: { title: '特殊员工', icon: 'form', roles: ['admin','activiti_admin'] }
+        meta: { title: '特殊员工', icon: 'form', roles: ['admin','activitiAdmin'] }
       },
       {
         path: '/activity/task',
@@ -228,44 +228,50 @@ export const asyncRoutes = [
       },
       {
         path: '/activity/process',
-        meta: { title: '申请', icon: 'example' },
         component: () => import('@/views/activity/process/index'),
+        meta: { title: '申请', icon: 'example' },
         children: [
+          {
+            path: '/activity/process/pretrip',
+            name: '出差申请',
+            component: () => import('@/views/activity/process/pretrip'),
+            meta: { title: '出差申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+          },
           {
             path: '/activity/process/leave',
             name: '请假申请',
             component: () => import('@/views/activity/process/leave'),
-            meta: { title: '请假申请', icon: 'example' }
+            meta: { title: '请假申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
           },
           {
             path: '/activity/process/OT',
             name: '加班申请',
             component: () => import('@/views/activity/process/ot'),
-            meta: { title: '加班申请', icon: 'example' }
+            meta: { title: '加班申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
           },
           {
             path: '/activity/process/absent',
             name: '直行直归申请',
             component: () => import('@/views/activity/process/absent'),
-            meta: { title: '直行直归申请', icon: 'example' }
+            meta: { title: '直行直归申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
           },
           {
             path: '/activity/process/late',
             name: '迟到早退',
             component: () => import('@/views/activity/process/late'),
-            meta: { title: '迟到早退', icon: 'example' }
+            meta: { title: '迟到早退', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
           },
           {
             path: '/activity/process/traffic',
             name: '交通费报销',
             component: () => import('@/views/activity/process/traffic'),
-            meta: { title: '交通费报销', icon: 'example' }
+            meta: { title: '交通费报销', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
           },
           {
             path: '/activity/process/trip',
             name: '出差报销',
             component: () => import('@/views/activity/process/trip'),
-            meta: { title: '出差报销', icon: 'example' }
+            meta: { title: '出差报销', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
           }
         ]
       },
@@ -273,7 +279,13 @@ export const asyncRoutes = [
         path: '/activity/history',
         component: () => import('@/views/activity/history'),
         name: '历史申请',
-        meta: { title: '历史申请', icon: 'form' }
+        meta: { title: '历史申请', icon: 'form', roles: ['admin','activityAdmin','activityDemo'] }
+      },
+      {
+        path: '/activity/historycom1',
+        component: () => import('@/views/activity/com/com1history'),
+        name: '历史申请',
+        meta: { title: '历史申请', icon: 'form', roles: ['admin','activityAdmin','activityDemo'] }
       },
     ]
   },
