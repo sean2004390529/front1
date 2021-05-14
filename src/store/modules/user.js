@@ -1,6 +1,7 @@
 import { login, logout, getInfo, loginOauth } from '@/api/user'
 import { getToken, setToken, removeToken, setRefreshToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+import { Message } from 'element-ui'
 
 const state = {
   token: getToken(),
@@ -40,7 +41,13 @@ const actions = {
         localStorage.setItem('Authorization', "Bearer " + response.access_token)
         resolve()
       }).catch(error => {
-        console.log("store - loginOauth - error")
+        if(error.data.error=="invalid_grant"){
+          Message({
+            message: "用户名或密码错误",
+            type:"warning",
+            duration: 5000
+          })
+        }
         reject(error)
       })
     })

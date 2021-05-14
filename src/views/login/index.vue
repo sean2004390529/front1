@@ -47,7 +47,7 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登 录</el-button>
 
-      <div style="position:relative">
+      <!-- <div style="position:relative">
         <div class="tips">
           <span>Username : admin</span>
           <span>Password : 666666</span>
@@ -56,7 +56,7 @@
           <span style="margin-right:18px;">Username : user</span>
           <span>Password : 666666</span>
         </div>
-      </div>
+      </div> -->
     </el-form>
   </div>
 </template>
@@ -75,16 +75,16 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('请输入正确的密码，且密码长度必须大于6位'))
+      if (value.length < 2) {
+        callback(new Error('请输入正确的密码，且密码长度必须大于2位'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'sean',
-        password: '666666'
+        username: undefined,
+        password: undefined
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -137,10 +137,10 @@ export default {
           this.loading = true
           // 新增以下
           login(this.loginForm).then( res =>{
-            console.log("loginSuccess",res)
+            console.log("handleLogin - loginSuccess",res)
           })
           .catch( res =>{
-            console.log("error", res)
+            console.log("handleLogin - error", res)
           })
           //新增以上
           this.$store.dispatch('user/login', this.loginForm)

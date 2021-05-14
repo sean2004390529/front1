@@ -2,7 +2,7 @@
   <div>
     <el-row :gutter="10">
 
-        <el-col :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
+        <!-- <el-col :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
           <a href="https://seancloud.tech:8000/#/todo/todo" >
             <div class="grid-content bg-purple" >
                 <i class="el-icon-edit icon"></i>
@@ -11,9 +11,9 @@
                 </el-link>
             </div>
           </a>
-        </el-col>
+        </el-col> -->
 
-        <el-col :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
+        <!-- <el-col :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
           <a href="https://seancloud.tech:8000/#/stock/reuse" >
             <div class="grid-content bg-purple-light">
                 <i class="el-icon-s-goods icon"></i>
@@ -22,7 +22,7 @@
                 </el-link>
             </div>
           </a>
-        </el-col>
+        </el-col> -->
 
         <el-col :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
           <a href="https://seancloud.tech:8000/#/calendar/calendar" >
@@ -36,6 +36,17 @@
         </el-col>
 
         <el-col :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
+          <a href="https://seancloud.tech:8000/#/activity/process/pretrip" >
+            <div class="grid-content bg-purple">
+                <i class="el-icon-message icon"></i>
+                <el-link type="info" class="link" :underline="false">
+                    出差申请
+                </el-link>
+            </div>
+          </a>
+        </el-col>
+
+        <!-- <el-col :xs="5" :sm="5" :md="5" :lg="5" :xl="5">
           <a href="https://seancloud.tech:8000/#/basic/emp" > 
             <div class="grid-content bg-purple-light">
                 <i class="el-icon-s-custom icon"></i>
@@ -44,7 +55,7 @@
                 </el-link>
             </div>
           </a>
-        </el-col>
+        </el-col> -->
         
     </el-row>
   </div>

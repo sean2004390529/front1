@@ -97,3 +97,12 @@ export function bindEmp(data) {
     data
   })
 }
+
+
+export function changepw(data) {
+  return request({
+    url: '/auth/user/changepw',
+    method: 'post',
+    data
+  })
+}

@@ -48,9 +48,14 @@ export const constantRoutes = [
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
         meta: { title: '主页', icon: 'dashboard', affix: true }
+      },
+      {
+        path: '/settings',
+        component: () => import('@/views/login/user-settings'),
+        hidden: true
       }
     ]
-  }
+  },
 ]
 
 export const asyncRoutes = [
@@ -58,7 +63,7 @@ export const asyncRoutes = [
     path: '/basic',
     component: Layout,
     redirect: '/basic/user',
-    meta: { title: '后台管理', icon: 'edit', roles: ['admin'] },
+    meta: { title: '后台管理', icon: 'edit', roles: ['admin','entadmin'] },
     children: [
       {
         path: '/basic/user',
@@ -88,13 +93,13 @@ export const asyncRoutes = [
         path: '/basic/dept',
         name: '部门管理',
         component: () => import('@/views/basic/dept'),
-        meta: { title: '部门管理', icon: 'tree', roles: ['admin'] }
+        meta: { title: '部门管理', icon: 'tree', roles: ['admin','entadmin'] }
       },
       {
         path: '/basic/emp',
         name: '员工管理',
         component: () => import('@/views/basic/emp'),
-        meta: { title: '员工管理', icon: 'people', roles: ['admin'] }
+        meta: { title: '员工管理', icon: 'people', roles: ['admin','entadmin'] }
       }
     ]
   },
@@ -186,7 +191,7 @@ export const asyncRoutes = [
     path: '/calendar',
     component: Layout,
     redirect: '/calendar',
-    meta: { title: '日程管理', icon: 'component', roles: ['admin','calendarRole'] },
+    meta: { title: '日程管理', icon: 'component', roles: ['admin','calendarRole','com1'] },
     children: [
       {
         path: 'calendar',
@@ -206,13 +211,13 @@ export const asyncRoutes = [
         path: '/activity/activity',
         component: () => import('@/views/activity/deployment'),
         name: 'activity',
-        meta: { title: '流程部署', icon: 'form', roles: ['admin','activitiAdmin'] }
+        meta: { title: '流程部署', icon: 'form', roles: ['admin'] }
       },
       {
         path: '/activity/instance',
         component: () => import('@/views/activity/instance'),
         name: '流程实例',
-        meta: { title: '流程实例', icon: 'form', roles: ['admin','activitiAdmin'] }
+        meta: { title: '流程实例', icon: 'form', roles: ['admin'] }
       },
       {
         path: '/activity/specialemp',
@@ -235,43 +240,43 @@ export const asyncRoutes = [
             path: '/activity/process/pretrip',
             name: '出差申请',
             component: () => import('@/views/activity/process/pretrip'),
-            meta: { title: '出差申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+            meta: { title: '出差申请', icon: 'example', roles: ['admin','activityDemo','com1'] }
           },
           {
             path: '/activity/process/leave',
             name: '请假申请',
             component: () => import('@/views/activity/process/leave'),
-            meta: { title: '请假申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+            meta: { title: '请假申请', icon: 'example', roles: ['admin','activityDemo'] }
           },
           {
             path: '/activity/process/OT',
             name: '加班申请',
             component: () => import('@/views/activity/process/ot'),
-            meta: { title: '加班申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+            meta: { title: '加班申请', icon: 'example', roles: ['admin','activityDemo'] }
           },
           {
             path: '/activity/process/absent',
             name: '直行直归申请',
             component: () => import('@/views/activity/process/absent'),
-            meta: { title: '直行直归申请', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+            meta: { title: '直行直归申请', icon: 'example', roles: ['admin','activityDemo'] }
           },
           {
             path: '/activity/process/late',
             name: '迟到早退',
             component: () => import('@/views/activity/process/late'),
-            meta: { title: '迟到早退', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+            meta: { title: '迟到早退', icon: 'example', roles: ['admin','activityDemo'] }
           },
           {
             path: '/activity/process/traffic',
             name: '交通费报销',
             component: () => import('@/views/activity/process/traffic'),
-            meta: { title: '交通费报销', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+            meta: { title: '交通费报销', icon: 'example', roles: ['admin','activityDemo'] }
           },
           {
             path: '/activity/process/trip',
             name: '出差报销',
             component: () => import('@/views/activity/process/trip'),
-            meta: { title: '出差报销', icon: 'example', roles: ['admin','activityAdmin','activityDemo'] }
+            meta: { title: '出差报销', icon: 'example', roles: ['admin','activityDemo'] }
           }
         ]
       },
@@ -279,13 +284,13 @@ export const asyncRoutes = [
         path: '/activity/history',
         component: () => import('@/views/activity/history'),
         name: '历史申请',
-        meta: { title: '历史申请', icon: 'form', roles: ['admin','activityAdmin','activityDemo'] }
+        meta: { title: '历史申请', icon: 'form', roles: ['admin','activityDemo'] }
       },
       {
         path: '/activity/historycom1',
         component: () => import('@/views/activity/com/com1history'),
-        name: '历史申请',
-        meta: { title: '历史申请', icon: 'form', roles: ['admin','activityAdmin','activityDemo'] }
+        name: '历史查看',
+        meta: { title: '历史查看', icon: 'form', roles: ['admin','com1'] }
       },
     ]
   },

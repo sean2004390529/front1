@@ -159,7 +159,7 @@ export default {
       list: null,
       listQuery: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 20,
         name: undefined,
         description: undefined
       },

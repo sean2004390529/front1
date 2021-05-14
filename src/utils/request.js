@@ -50,12 +50,16 @@ service.interceptors.response.use(
       if (error.response.status) {
           switch (error.response.status) {
               case 400:
-
                   //do something
+                //   Message("用户名或密码错误,request.js")
                   break;
 
               case 401:
-                  alert("session expired");
+                  Message("无权限访问，请登出重新登录")
+                  router.replace({
+                    path: "/login",
+                    query: { redirect: router.currentRoute.fullPath }
+                  });
                   break;
               case 403:
                   router.replace({

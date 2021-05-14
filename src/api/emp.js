@@ -75,3 +75,11 @@ export function fetchOtherEmpColor(empName) {
     method: 'get'
   })
 }
+
+
+export function fetchYourself() {
+  return request({
+    url: '/basic/emp/yourself',
+    method: 'get'
+  })
+}

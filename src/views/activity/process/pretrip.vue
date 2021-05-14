@@ -65,7 +65,7 @@
       <div v-show="active==1">
         <el-form ref="fellowForm" :rules="fellowRules" :model="temp" label-position="left" label-width="150px" >
           <el-form-item label="第一申请人" prop="emp1Name">
-            <el-select v-model="temp.emp1Name" clearable placeholder="申请人" value-key="item" @change="emp1Change">
+            <el-select v-model="temp.emp1Name" clearable placeholder="申请人" value-key="item" @change="emp1Change" disabled>
               <el-option
                 v-for="(item,idx) in emp1Options"
                 :key="idx"
@@ -73,7 +73,7 @@
                 :value="item">
               </el-option>
             </el-select>
-            <el-button icon="el-icon-user-solid" @click="handleSelectEmp('emp1')">选择部门</el-button>
+            <!-- <el-button icon="el-icon-user-solid" @click="handleSelectEmp('emp1')">选择部门</el-button> -->
           </el-form-item>
 
           <el-form-item label="第二申请人" prop="emp2Name">
@@ -202,14 +202,13 @@
       </div>
 
     <div>
-    <el-button @click="updateFromPretrip">测试</el-button>
   </div>
 </template>
 
 <script>
 import { submit } from '@/api/activiti/process/pretrip'
 import { fetchList as fetchDeptList } from '@/api/dept'
-import { fetchsubDeptEmp } from '@/api/emp'
+import { fetchsubDeptEmp, fetchYourself } from '@/api/emp'
 import { updateFromPretrip } from '@/api/calendar'
 
 export default {
@@ -218,7 +217,7 @@ export default {
     return {
       active: 0,
       temp: {
-        title: '○月○日出差申請',
+        title: '○月○日出差',
         destination: undefined,
         tripDate: undefined,
         reason: undefined,
@@ -265,16 +264,22 @@ export default {
         children: 'children',
         label: 'deptName'
       },
-      updateSchedule: false
+      updateSchedule: true
     }
   },
   created() {
-      //
+      this.fetchYourself()
   },
   methods: {
+    fetchYourself(){
+      fetchYourself().then(res => {
+        this.temp.emp1Id = res.data.empId;
+        this.temp.emp1Name = res.data.empName;
+      })
+    },
     resetTemp() {
       this.temp = {
-        title: '○月○日出差申請',
+        title: '○月○日出差',
         destination: undefined,
         tripDate: undefined,
         reason: undefined,
@@ -315,6 +320,9 @@ export default {
     },
     submit(){
       this.checkStep1()
+      if(this.updateSchedule){
+          this.updateFromPretrip(this.temp)
+      }
       this.$refs['leaderForm'].validate((valid) => {
         if(valid && this.permitSubmit){
           submit(this.temp).then(() => {
@@ -325,9 +333,6 @@ export default {
               type: 'success',
               duration: 5000
             })
-            if(this.updateSchedule){
-                this.updateFromPretrip(this.temp)
-            }
             setTimeout(() => {
               this.$router.push({path:"/activity/task"})
             }, 500)
