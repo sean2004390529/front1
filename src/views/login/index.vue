@@ -45,7 +45,25 @@
         </el-form-item>
       </el-tooltip>
 
+      <el-form-item prop="CAPTCHA">
+        <span class="svg-container">
+          <svg-icon icon-class="bug" />
+        </span>
+        <el-input v-model="loginForm.CAPTCHA" placeholder="请输入验证码" @change="checkCode"/>
+        <span class="code" v-show="showCodeChecked" >
+          <i class="el-icon-check" />
+        </span>
+      </el-form-item>
+
+      <div v-if="!codeUrl">
+        <el-image class="codeImage" :src="codeUrl" fit="fill" @click="getCode"></el-image>
+      </div>
+      <div v-else class="codeImage" >
+        <el-button type="warning" @click="getCode">刷新验证码</el-button>
+      </div>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登 录</el-button>
+
 
       <!-- <div style="position:relative">
         <div class="tips">
@@ -57,12 +75,14 @@
           <span>Password : 666666</span>
         </div>
       </div> -->
+
     </el-form>
   </div>
 </template>
 
 <script>
-import { loginOauth, login } from '@/api/user'
+import { login, createfrontCode, getCode } from '@/api/user'
+import { loginUUID } from '@/utils'
 
 export default {
   name: 'Login',
@@ -81,6 +101,13 @@ export default {
         callback()
       }
     }
+    const validateCAPTCHA = (rule, value, callback) => {
+      if (value!=this.backCode) {
+        callback(new Error('请输入正确的验证码'))
+      } else {
+        callback()
+      }
+    }
     return {
       loginForm: {
         username: undefined,
@@ -88,13 +115,19 @@ export default {
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        CAPTCHA: [{ required: true, trigger: 'blur', validator: validateCAPTCHA }]
       },
       passwordType: 'password',
       capsTooltip: false,
       loading: false,
       redirect: undefined,
-      otherQuery: {}
+      otherQuery: {},
+      showCodeChecked: false,
+      CAPTCHA: '',
+      codeUrl: '',
+      frontCode: '',
+      backCode: ''
     }
   },
   watch: {
@@ -115,6 +148,9 @@ export default {
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
     }
+  },
+  created(){
+    this.getCode()
   },
   methods: {
     checkCapslock(e) {
@@ -166,6 +202,21 @@ export default {
         }
         return acc
       }, {})
+    },
+    getCode(){
+      this.frontCode = loginUUID()
+      getCode(this.frontCode).then( res => {
+        this.codeUrl = res.data
+        this.backCode = res.msg
+        console.log("getCode", this.frontCode, this.backCode)
+      })
+    },
+    checkCode(){
+      if(this.backCode == this.loginForm.CAPTCHA){
+        this.showCodeChecked = true
+      }else{
+        this.showCodeChecked = false
+      }
     }
   }
 }
@@ -277,6 +328,16 @@ $light_gray:#eee;
     user-select: none;
   }
 
+  .code {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    font-size: 16px;
+    color: $dark_gray;
+    cursor: none;
+    user-select: none;
+  }
+
   .thirdparty-button {
     position: absolute;
     right: 0;
@@ -288,5 +349,15 @@ $light_gray:#eee;
       display: none;
     }
   }
+
+  .codeWrapper{
+    position: relative;
+  }
+
+  .codeImage {
+    margin-left: 10px;
+    margin-bottom: 10px;
+  }
+
 }
 </style>

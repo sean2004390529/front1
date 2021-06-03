@@ -106,3 +106,17 @@ export function changepw(data) {
     data
   })
 }
+
+export function createCodeToken() {
+  return request({
+    url: '/auth/user/codetoken',
+    method: 'get'
+  })
+}
+
+export function getCode(frontCode) {
+  return request({
+    url: `/auth/user/code/${frontCode}`,
+    method: 'get',
+  })
+}

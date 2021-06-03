@@ -426,3 +426,7 @@ export function hexToRGB(hex){
   let b = parseInt("0x" + hex.slice(5,7))
   return {r,g,b}
 }
+
+export function loginUUID(){
+  return Number(Math.random().toString().substr(3))
+}
